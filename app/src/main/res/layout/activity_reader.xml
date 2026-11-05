@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutReaderRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_cream"
+    tools:context=".ReaderActivity">
+
+    <!-- Top Header Bar -->
+    <RelativeLayout
+        android:id="@+id/toolbarReader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp">
+
+        <ImageView
+            android:id="@+id/btnBackReader"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Kembali"
+            android:padding="4dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/primary_green" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="12dp"
+            android:layout_toEndOf="@id/btnBackReader"
+            android:layout_toStartOf="@id/btnBookmarkReader"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvReaderBookTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Kepemimpinan Visioner Di Lembaga Pendidikan Islam"
+                android:textColor="@color/primary_green"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvReaderBookAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Dr. Ahmad Zain Sarnoto..."
+                android:textColor="@color/text_muted"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnBookmarkReader"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Bookmark"
+            android:padding="4dp"
+            android:src="@drawable/ic_bookmark_check"
+            app:tint="@color/primary_green" />
+
+    </RelativeLayout>
+
+    <!-- Bottom Controls Container -->
+    <LinearLayout
+        android:id="@+id/layoutReaderBottomControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/bg_cream"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
+
+        <!-- Page Navigation Row (Prev Arrow, Page Info, Next Arrow) -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:id="@+id/btnPrevPage"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Halaman Sebelumnya"
+                android:padding="2dp"
+                android:src="@drawable/ic_chevron_left"
+                app:tint="@color/primary_green" />
+
+            <TextView
+                android:id="@+id/tvReaderProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="42 / 216 halaman · 20%"
+                android:textColor="@color/text_muted"
+                android:textSize="12.5sp" />
+
+            <ImageView
+                android:id="@+id/btnNextPage"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Halaman Selanjutnya"
+                android:padding="2dp"
+                android:src="@drawable/ic_chevron_right"
+                app:tint="@color/primary_green" />
+
+        </RelativeLayout>
+
+        <!-- Reading Progress Line -->
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_marginBottom="12dp"
+            android:max="100"
+            android:progress="20"
+            android:progressBackgroundTint="@color/card_cream"
+            android:progressTint="@color/primary_green" />
+
+        <!-- Divider Line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/divider_color" />
+
+        <!-- Tools Row: Daftar isi, Tampilan, Catatan -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Daftar isi -->
+            <LinearLayout
+                android:id="@+id/btnToc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Daftar Isi"
+                    android:src="@drawable/ic_list_format"
+                    app:tint="@color/primary_green" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Daftar isi"
+                    android:textColor="@color/primary_green"
+                    android:textSize="12.5sp" />
+
+            </LinearLayout>
+
+            <!-- Tampilan -->
+            <LinearLayout
+                android:id="@+id/btnAppearance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Tampilan"
+                    android:src="@drawable/ic_text_format"
+                    app:tint="@color/primary_green" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tampilan"
+                    android:textColor="@color/primary_green"
+                    android:textSize="12.5sp" />
+
+            </LinearLayout>
+
+            <!-- Catatan -->
+            <LinearLayout
+                android:id="@+id/btnNotes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Catatan"
+                    android:src="@drawable/ic_note_edit"
+                    app:tint="@color/primary_green" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Catatan"
+                    android:textColor="@color/primary_green"
+                    android:textSize="12.5sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Reading Content Scroll View -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollViewReader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutReaderBottomControls"
+        android:layout_below="@id/toolbarReader"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="8dp">
+
+            <!-- Chapter Subtitle: BAB 3 -->
+            <TextView
+                android:id="@+id/tvChapterNum"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="BAB 3"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Chapter Title: Strategi Perumusan Visi Lembaga -->
+            <TextView
+                android:id="@+id/tvChapterTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="Strategi Perumusan Visi Lembaga"
+                android:textColor="@color/primary_green"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <!-- Paragraph 1 -->
+            <TextView
+                android:id="@+id/tvParagraph1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:lineSpacingExtra="6sp"
+                android:text="Pengembangan lembaga pendidikan Islam yang unggul membutuhkan landasan kepemimpinan yang berorientasi pada masa depan. Seorang pemimpin visioner tidak hanya bertugas merumuskan arah strategis, tetapi juga harus mampu mengintegrasikan nilai-nilai keislaman ke dalam seluruh ekosistem organisasi."
+                android:textColor="@color/text_dark"
+                android:textSize="15sp" />
+
+            <!-- Paragraph 2 -->
+            <TextView
+                android:id="@+id/tvParagraph2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:lineSpacingExtra="6sp"
+                android:text="Dalam konteks dinamika era digital, tantangan utama pimpinan madrasah maupun pesantren adalah menyelaraskan tradisi keilmuan Islam (turats) dengan tuntutan kompetensi abad ke-21. Hal ini menuntut fleksibilitas dalam tata kelola tanpa mengorbankan nilai dasar keislaman. Keberhasilan perumusan visi sangat bergantung pada keterlibatan seluruh pemangku kepentingan. Pembentukan budaya organisasi yang partisipatif akan mendorong terciptanya komitmen bersama dalam mewujudkan penjaminan mutu pendidikan yang berkelanjutan."
+                android:textColor="@color/text_dark"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutProfileRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_cream"
+    tools:context=".ProfileActivity">
+
+    <!-- Top App Header -->
+    <RelativeLayout
+        android:id="@+id/layoutProfileHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/btnSettingsProfile"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lora"
+                android:text="Profil anggota"
+                android:textColor="@color/primary_green"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/inter"
+                android:text="Ruang untukmu dan komunitas pembaca."
+                android:textColor="@color/text_muted"
+                android:textSize="12.5sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnSettingsProfile"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Pengaturan"
+            android:padding="4dp"
+            android:src="@drawable/ic_settings"
+            app:tint="@color/primary_green" />
+
+    </RelativeLayout>
+
+    <!-- Bottom Navigation Bar (Profil Selected) -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/bg_cream"
+        app:elevation="8dp"
+        app:itemIconTint="@color/bottom_nav_color_selector"
+        app:itemTextColor="@color/bottom_nav_color_selector"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_profile_menu" />
+
+    <!-- Content Scroll View -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavigationProfile"
+        android:layout_below="@id/layoutProfileHeader"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="4dp">
+
+            <!-- User Avatar & Info Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <!-- Avatar Circle "AP" -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    app:cardBackgroundColor="#E2ECE5"
+                    app:cardCornerRadius="28dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/lora"
+                        android:text="AP"
+                        android:textColor="@color/primary_green"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:text="Alya Putri"
+                        android:textColor="@color/primary_green"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter"
+                        android:text="Reader sejak 2026"
+                        android:textColor="@color/text_muted"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Digital Member Card (Kartu Anggota Digital) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDigitalMember"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/primary_green"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="20dp">
+
+                    <!-- Background Wave Curves on Top Right -->
+                    <ImageView
+                        android:layout_width="160dp"
+                        android:layout_height="160dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true"
+                        android:contentDescription="Wave Pattern"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/ic_card_waves" />
+
+                    <!-- Top Card Info -->
+                    <TextView
+                        android:id="@+id/tvCardAppName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:fontFamily="@font/lora"
+                        android:text="Pena Cendekia"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:contentDescription="Book"
+                        android:src="@drawable/ic_book_open"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvCardSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tvCardAppName"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/inter"
+                        android:letterSpacing="0.1"
+                        android:text="KARTU ANGGOTA DIGITAL"
+                        android:textColor="#A6BFB2"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tvCardSubtitle"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter"
+                        android:text="Reader"
+                        android:textColor="#A6BFB2"
+                        android:textSize="12sp" />
+
+                    <!-- Bottom Name & Number -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentStart="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter"
+                            android:text="Alya Putri"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/inter"
+                            android:text="Android • 2026 • 008721"
+                            android:textColor="#A6BFB2"
+                            android:textSize="11.5sp" />
+
+                    </LinearLayout>
+
+                    <!-- Watermark Logo Emblem on Bottom Right (Replacing QR) -->
+                    <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentEnd="true"
+                        android:adjustViewBounds="true"
+                        android:alpha="0.5"
+                        android:contentDescription="Watermark Pena Cendekia"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/watermark_pena_cendekia" />
+
+                </RelativeLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Statistics Counters Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:orientation="horizontal">
+
+                <!-- Stat 1: 18 Buku selesai -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:text="18"
+                        android:textColor="@color/primary_green"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter"
+                        android:text="Buku selesai"
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <!-- Stat 2: 2 Sesi Berlangsung -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:text="2"
+                        android:textColor="@color/primary_green"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter"
+                        android:text="Sesi Berlangsung"
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <!-- Stat 3: 2 Favorit -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter"
+                        android:text="2"
+                        android:textColor="@color/primary_green"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/inter"
+                        android:text="Favorit"
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Mau Jadi Penulis Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBecomeAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="#EFF5F1"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:fontFamily="@font/lora"
+                            android:text="Mau Jadi Penulis?"
+                            android:textColor="@color/primary_green"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="4dp"
+                                android:fontFamily="@font/inter"
+                                android:text="Yuk Daftar!"
+                                android:textColor="@color/primary_green"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:layout_width="14dp"
+                                android:layout_height="14dp"
+                                android:contentDescription="Arrow"
+                                android:src="@drawable/ic_arrow_right"
+                                app:tint="@color/primary_green" />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:fontFamily="@font/inter"
+                        android:lineSpacingExtra="2sp"
+                        android:text="Terbitkan karya akademismu dan jangkau puluhan ribu pembaca di Pena Cendekia."
+                        android:textColor="@color/text_muted"
+                        android:textSize="12.5sp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Account Settings List -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Item 1: Data anggota & akun -->
+                <RelativeLayout
+                    android:id="@+id/btnAccountData"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="4dp">
+
+                    <ImageView
+                        android:id="@+id/ivItem1"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="Data anggota"
+                        android:src="@drawable/ic_user_round"
+                        app:tint="@color/primary_green" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="14dp"
+                        android:layout_toEndOf="@id/ivItem1"
+                        android:fontFamily="@font/inter"
+                        android:text="Data anggota &amp; akun"
+                        android:textColor="@color/primary_green"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="Arrow"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/primary_green" />
+
+                </RelativeLayout>
+
+                <!-- Item 2: Notifikasi & privasi -->
+                <RelativeLayout
+                    android:id="@+id/btnNotificationPrivacy"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="4dp">
+
+                    <ImageView
+                        android:id="@+id/ivItem2"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="Notifikasi"
+                        android:src="@drawable/ic_shield_check"
+                        app:tint="@color/primary_green" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="14dp"
+                        android:layout_toEndOf="@id/ivItem2"
+                        android:fontFamily="@font/inter"
+                        android:text="Notifikasi &amp; privasi"
+                        android:textColor="@color/primary_green"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="Arrow"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/primary_green" />
+
+                </RelativeLayout>
+
+                <!-- Item 3: Pusat bantuan -->
+                <RelativeLayout
+                    android:id="@+id/btnHelpCenter"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="4dp">
+
+                    <ImageView
+                        android:id="@+id/ivItem3"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="Bantuan"
+                        android:src="@drawable/ic_circle_help"
+                        app:tint="@color/primary_green" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="14dp"
+                        android:layout_toEndOf="@id/ivItem3"
+                        android:fontFamily="@font/inter"
+                        android:text="Pusat bantuan"
+                        android:textColor="@color/primary_green"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:contentDescription="Arrow"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/primary_green" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>
