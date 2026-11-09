@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_beranda"
+        android:icon="@drawable/ic_house"
+        android:title="Beranda" />
+    <item
+        android:id="@+id/nav_katalog"
+        android:checked="true"
+        android:icon="@drawable/ic_search"
+        android:title="Katalog" />
+    <item
+        android:id="@+id/nav_rak"
+        android:icon="@drawable/ic_library"
+        android:title="Rak Saya" />
+    <item
+        android:id="@+id/nav_profil"
+        android:icon="@drawable/ic_user_round"
+        android:title="Profil" />
+</menu>

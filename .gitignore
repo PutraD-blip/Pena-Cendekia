@@ -1,0 +1,32 @@
+# Android Ignored Files
+.idea/
+*.iml
+.gradle/
+**/.gradle/
+local.properties
+**/build/
+app/build/
+*.apk
+*.aab
+.externalNativeBuild/
+.cxx/
+/captures
+
+# Laravel & Web Backend Ignored Files
+**/vendor/
+**/node_modules/
+**/.env
+**/.env.backup
+**/.env.production
+**/storage/*.key
+**/storage/logs/*.log
+**/storage/framework/cache/data/*
+**/storage/framework/sessions/*
+**/storage/framework/views/*
+**/public/hot
+**/public/storage
+
+# General OS & Editor Ignored Files
+.DS_Store
+Thumbs.db
+*.log

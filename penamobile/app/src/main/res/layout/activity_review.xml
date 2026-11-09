@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutReviewRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_cream"
+    tools:context=".ReviewActivity">
+
+    <!-- Top Header Bar -->
+    <LinearLayout
+        android:id="@+id/toolbarReview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp">
+
+        <ImageView
+            android:id="@+id/btnBackReview"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Kembali"
+            android:padding="4dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/primary_green" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:fontFamily="@font/lora"
+            android:text="Ulasan &amp; Rating"
+            android:textColor="@color/primary_green"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Bottom Navigation Bar -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationReview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/bg_cream"
+        app:elevation="8dp"
+        app:itemActiveIndicatorStyle="@style/Widget.PenaCendekia.BottomNavigationView.ActiveIndicator"
+        app:itemRippleColor="@color/nav_ripple_shadow"
+        app:itemIconTint="@color/bottom_nav_color_selector"
+        app:itemTextColor="@color/bottom_nav_color_selector"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_shelf_menu" />
+
+    <!-- Content Scrollable View -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavigationReview"
+        android:layout_below="@id/toolbarReview"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:isScrollContainer="true"
+        android:overScrollMode="never"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="4dp">
+
+            <!-- Book Header Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="#EEF3EF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="54dp"
+                        android:layout_height="76dp"
+                        app:cardBackgroundColor="@color/card_cream"
+                        app:cardCornerRadius="6dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="0dp">
+
+                        <ImageView
+                            android:id="@+id/ivReviewBookCover"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Cover Buku"
+                            android:scaleType="centerCrop"
+                            tools:src="@drawable/img_kepemimpinan_cover" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvReviewBookTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/inter"
+                            android:maxLines="2"
+                            android:textColor="@color/primary_green"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            tools:text="Kepemimpinan Visioner Di Lembaga Pendidikan Islam" />
+
+                        <TextView
+                            android:id="@+id/tvReviewBookAuthor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/inter"
+                            android:maxLines="1"
+                            android:textColor="@color/text_muted"
+                            android:textSize="12sp"
+                            tools:text="Dr. Ahmad Zain Sarnoto... · Pendidikan" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Rating Summary Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardRatingSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/divider_color"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <!-- Left: Score & Stars -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:paddingEnd="16dp">
+
+                        <TextView
+                            android:id="@+id/tvRatingScore"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/inter"
+                            android:textColor="@color/primary_green"
+                            android:textSize="40sp"
+                            android:textStyle="bold"
+                            tools:text="4,9" />
+
+                        <TextView
+                            android:id="@+id/tvRatingStarsArtshow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/inter"
+                            android:letterSpacing="0.12"
+                            android:text="★ ★ ★ ★ ★"
+                            android:textColor="#E69A19"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvTotalReviewsCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/inter"
+                            android:textColor="@color/text_muted"
+                            android:textSize="12sp"
+                            tools:text="86 ulasan" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="16dp"
+                        android:background="@color/divider_color" />
+
+                    <!-- Right: Distribution Bars -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="vertical">
+
+                        <!-- Row 5 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:text="5" android:textColor="@color/text_muted" android:textSize="12sp"/>
+                            <View android:layout_width="0dp" android:layout_height="6dp" android:layout_marginHorizontal="8dp" android:layout_weight="0.9" android:background="#C5A880"/>
+                            <TextView android:layout_width="32dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:gravity="end" android:text="90%" android:textColor="@color/text_muted" android:textSize="11sp"/>
+                        </LinearLayout>
+
+                        <!-- Row 4 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:text="4" android:textColor="@color/text_muted" android:textSize="12sp"/>
+                            <View android:layout_width="0dp" android:layout_height="6dp" android:layout_marginHorizontal="8dp" android:layout_weight="0.08" android:background="#C5A880"/>
+                            <View android:layout_width="0dp" android:layout_height="6dp" android:layout_weight="0.82" android:background="@android:color/transparent"/>
+                            <TextView android:layout_width="32dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:gravity="end" android:text="8%" android:textColor="@color/text_muted" android:textSize="11sp"/>
+                        </LinearLayout>
+
+                        <!-- Row 3 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:text="3" android:textColor="@color/text_muted" android:textSize="12sp"/>
+                            <View android:layout_width="0dp" android:layout_height="6dp" android:layout_marginHorizontal="8dp" android:layout_weight="0.02" android:background="#C5A880"/>
+                            <View android:layout_width="0dp" android:layout_height="6dp" android:layout_weight="0.88" android:background="@android:color/transparent"/>
+                            <TextView android:layout_width="32dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:gravity="end" android:text="2%" android:textColor="@color/text_muted" android:textSize="11sp"/>
+                        </LinearLayout>
+
+                        <!-- Row 2 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:text="2" android:textColor="@color/text_muted" android:textSize="12sp"/>
+                            <View android:layout_width="0dp" android:layout_height="6dp" android:layout_marginHorizontal="8dp" android:layout_weight="0.9" android:background="@android:color/transparent"/>
+                            <TextView android:layout_width="32dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:gravity="end" android:text="0%" android:textColor="@color/text_muted" android:textSize="11sp"/>
+                        </LinearLayout>
+
+                        <!-- Row 1 -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+                            <TextView android:layout_width="12dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:text="1" android:textColor="@color/text_muted" android:textSize="12sp"/>
+                            <View android:layout_width="0dp" android:layout_height="6dp" android:layout_marginHorizontal="8dp" android:layout_weight="0.9" android:background="@android:color/transparent"/>
+                            <TextView android:layout_width="32dp" android:layout_height="wrap_content" android:fontFamily="@font/inter" android:gravity="end" android:text="0%" android:textColor="@color/text_muted" android:textSize="11sp"/>
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Suara Pembaca Section Header -->
+            <RelativeLayout
+                android:id="@+id/reviewSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:fontFamily="@font/lora"
+                    android:text="Suara pembaca"
+                    android:textColor="@color/primary_green"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:fontFamily="@font/inter"
+                    android:text="Terbaru ↓"
+                    android:textColor="@color/primary_green"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+
+            <!-- Reviewer 1 -->
+            <LinearLayout
+                android:id="@+id/reviewItemOne"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        app:cardBackgroundColor="#E2EBE4"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="@font/inter"
+                            android:gravity="center"
+                            android:text="DS"
+                            android:textColor="@color/primary_green"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:fontFamily="@font/inter"
+                                android:text="Dina Sari"
+                                android:textColor="@color/text_dark"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:fontFamily="@font/inter"
+                                android:text="1 Okt 2026"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp" />
+
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter"
+                                android:text="★★★★★"
+                                android:textColor="#C5A880"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:fontFamily="@font/inter"
+                                android:text="· Pembaca terverifikasi"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/inter"
+                            android:lineSpacingExtra="3dp"
+                            android:text="Bahasanya runtut dan solutif. Sangat membantu memberi gambaran manajemen strategis untuk madrasah modern."
+                            android:textColor="@color/text_dark"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/reviewItemDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/divider_color" />
+
+            <!-- Reviewer 2 -->
+            <LinearLayout
+                android:id="@+id/reviewItemTwo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        app:cardBackgroundColor="#E2EBE4"
+                        app:cardCornerRadius="18dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:fontFamily="@font/inter"
+                            android:gravity="center"
+                            android:text="AF"
+                            android:textColor="@color/primary_green"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/tvReviewFormTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:fontFamily="@font/inter"
+                                android:text="Andi Firman"
+                                android:textColor="@color/text_dark"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:fontFamily="@font/inter"
+                                android:text="30 Sep 2026"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp" />
+
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter"
+                                android:text="★★★★★"
+                                android:textColor="#C5A880"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:fontFamily="@font/inter"
+                                android:text="· Pembaca terverifikasi"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/inter"
+                            android:lineSpacingExtra="3dp"
+                            android:text="Bedah teorinya mendalam, disertai contoh studi kasus yang sangat relevan bagi pimpinan lembaga pendidikan."
+                            android:textColor="@color/text_dark"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Form Ulasan & Rating Rapi & Modern -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp"
+                app:strokeColor="@color/divider_color"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Header Section Ulasan -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/lora"
+                        android:text="Beri Rating &amp; Ulasan"
+                        android:textColor="@color/primary_green"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvReviewFormInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/inter"
+                        android:text="Bagikan pengalaman membaca dan penilaian Anda untuk buku ini."
+                        android:textColor="@color/text_muted"
+                        android:textSize="12sp" />
+
+                    <!-- Rating Stars Centered Container -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                        <RatingBar
+                            android:id="@+id/ratingBarUserReview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:isIndicator="false"
+                            android:numStars="5"
+                            android:progressTint="#E69A19"
+                            android:rating="0"
+                            android:secondaryProgressTint="#E69A19"
+                            android:stepSize="1" />
+
+                        <!-- Badge Status Rating (Pill Box) -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:backgroundTint="#EFF5F1"
+                            android:gravity="center"
+                            android:paddingHorizontal="14dp"
+                            android:paddingVertical="6dp">
+
+                            <TextView
+                                android:id="@+id/tvUserReviewRating"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter"
+                                android:text="Sentuh bintang di atas untuk memberi rating"
+                                android:textColor="@color/primary_green"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Input Box Card Container -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:cardBackgroundColor="@color/white"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/divider_color"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter"
+                                android:letterSpacing="0.04"
+                                android:paddingHorizontal="14dp"
+                                android:paddingTop="12dp"
+                                android:text="ULASAN ANDA"
+                                android:textColor="@color/text_muted"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+
+                            <EditText
+                                android:id="@+id/etUserReview"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="@android:color/transparent"
+                                android:fontFamily="@font/inter"
+                                android:gravity="top|start"
+                                android:hint="Tuliskan ulasan Anda mengenai materi, gaya bahasa, atau manfaat dari buku ini..."
+                                android:inputType="textMultiLine"
+                                android:lineSpacingExtra="4dp"
+                                android:maxLength="500"
+                                android:minLines="4"
+                                android:paddingHorizontal="14dp"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="12dp"
+                                android:textColor="@color/text_dark"
+                                android:textColorHint="#98A59E"
+                                android:textSize="13.5sp" />
+
+                            <!-- Divider inside Input Card -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginHorizontal="14dp"
+                                android:background="#EDF2EE" />
+
+                            <!-- Footer Row inside Input Card -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingHorizontal="14dp"
+                                android:paddingVertical="8dp">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/inter"
+                                    android:text="Ulasan akan tampil publik"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="11sp" />
+
+                                <TextView
+                                    android:id="@+id/tvReviewCharacterCount"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/inter"
+                                    android:text="0 / 500"
+                                    android:textColor="@color/text_muted"
+                                    android:textSize="11.5sp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Tombol Kirim Ulasan -->
+                    <Button
+                        android:id="@+id/btnSubmitReview"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="16dp"
+                        android:backgroundTint="@color/primary_green"
+                        android:fontFamily="@font/inter"
+                        android:text="Kirim Ulasan"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="12dp"
+                        app:elevation="2dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

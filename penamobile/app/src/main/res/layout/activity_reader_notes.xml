@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutReaderNotesRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_cream"
+    tools:context=".ReaderNotesActivity">
+
+    <!-- Top Header Bar -->
+    <LinearLayout
+        android:id="@+id/toolbarNotes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="12dp">
+
+        <ImageView
+            android:id="@+id/btnBackNotes"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Kembali"
+            android:padding="4dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/primary_green" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvBookTitleNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Digitalisasi Pendidikan Islam"
+                android:textColor="@color/primary_green"
+                android:textSize="18sp"
+                android:fontFamily="@font/lora"
+                app:fontFamily="@font/lora"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSubtitleNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Bab tiga · halaman 42"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:fontFamily="@font/inter"
+                app:fontFamily="@font/inter" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnBookmarkNotes"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Bookmark"
+            android:padding="4dp"
+            android:src="@drawable/ic_bookmark_check"
+            app:tint="@color/primary_green" />
+
+    </LinearLayout>
+
+    <!-- Reading Content Scroll View (Full text filling the screen) -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollViewNotesContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/layoutBottomControlContainer"
+        android:layout_below="@id/toolbarNotes"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        android:fillViewport="true"
+        android:isScrollContainer="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="8dp">
+
+            <!-- Chapter Subtitle -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="BAB 3"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Chapter Title -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="Strategi Perumusan Visi Lembaga"
+                android:textColor="@color/primary_green"
+                android:textSize="24sp"
+                android:fontFamily="@font/lora"
+                app:fontFamily="@font/lora"
+                android:textStyle="bold" />
+
+            <!-- Paragraph 1 -->
+            <TextView
+                android:id="@+id/tvParagraph1Notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:lineSpacingExtra="6sp"
+                android:fontFamily="@font/lora"
+                app:fontFamily="@font/lora"
+                android:text="Seorang pemimpin visioner tidak hanya bertugas merumuskan arah strategis, tetapi juga harus mampu mengintegrasikan nilai-nilai keislaman ke dalam seluruh ekosistem organisasi."
+                android:textColor="@color/text_dark"
+                android:textSize="15sp" />
+
+            <!-- Highlighted Quote Box -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardHighlightedText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="#F8E79F"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <TextView
+                    android:id="@+id/tvHighlightedContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="5sp"
+                    android:padding="14dp"
+                    android:fontFamily="@font/lora"
+                    app:fontFamily="@font/lora"
+                    android:text="Dalam konteks dinamika era digital, tantangan utama pimpinan madrasah maupun pesantren adalah menyelaraskan tradisi keilmuan Islam (turats) dengan tuntutan kompetensi abad ke-21."
+                    android:textColor="#2B332E"
+                    android:textSize="14.5sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Paragraph 2 -->
+            <TextView
+                android:id="@+id/tvParagraph2Notes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:lineSpacingExtra="6sp"
+                android:fontFamily="@font/lora"
+                app:fontFamily="@font/lora"
+                android:text="Strategi perumusan visi yang inklusif menuntut keterlibatan seluruh pemangku kepentingan, mulai dari jajaran pengasuh, tenaga pendidik, hingga alumni. Dengan pola komunikasi dua arah yang terbuka, arah pengembangan lembaga dapat dipahami dan didukung secara kolektif."
+                android:textColor="@color/text_dark"
+                android:textSize="15sp" />
+
+            <!-- Bookmark Notice Tag -->
+            <LinearLayout
+                android:id="@+id/layoutBookmarkNotice"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Bookmark"
+                    android:src="@drawable/ic_bookmark_check"
+                    app:tint="@color/primary_green" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Halaman 42 ditandai · Lihat 3 penanda"
+                    android:textColor="@color/primary_green"
+                    android:textSize="12.5sp" />
+
+            </LinearLayout>
+
+            <!-- Copyright Shield Banner -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="#E8F2EC"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="14dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="top"
+                        android:layout_marginTop="2dp"
+                        android:contentDescription="Shield"
+                        android:src="@drawable/ic_shield_check"
+                        app:tint="@color/primary_green" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:text="Hak cipta dilindungi. Teks tidak dapat disalin atau diunduh keluar aplikasi. Membaca hanya di dalam Pena Cendekia."
+                        android:textColor="@color/primary_green"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Container Layout for Controls (Tool Bar + Dynamic Popups) -->
+    <LinearLayout
+        android:id="@+id/layoutBottomControlContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="16dp">
+
+        <!-- Dynamic Panel 1: Catatan Kecil Card Input (Shown on 'Catatan' click) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardNoteInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:text="Catatan kecil"
+                        android:textColor="@color/primary_green"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:text="Halaman 42"
+                        android:textColor="@color/primary_green"
+                        android:textSize="12sp" />
+
+                </RelativeLayout>
+
+                <!-- Text Input Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_filter_box"
+                    android:padding="12dp">
+
+                    <EditText
+                        android:id="@+id/etNoteContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="Tulis catatan kecil untuk halaman ini..."
+                        android:lineSpacingExtra="4sp"
+                        android:minLines="3"
+                        android:text="Kutipan penting untuk Bab 2 Tesis: Sintesis antara nilai turats dan modernisasi kurikulum madrasah."
+                        android:textColor="@color/text_dark"
+                        android:textSize="13.5sp" />
+
+                </LinearLayout>
+
+                <!-- Save Note Button -->
+                <Button
+                    android:id="@+id/btnSaveNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="@color/primary_green"
+                    android:text="Simpan catatan"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="10dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Dynamic Panel 2: Color Picker Row (Shown on 'Sorot' click) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/layoutColorPicker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="4dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Pilih warna sorotan:"
+                    android:textColor="@color/primary_green"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <!-- Yellow Circle -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardColorYellow"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="#F8E79F"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/primary_green"
+                    app:strokeWidth="2dp">
+
+                    <ImageView
+                        android:id="@+id/icCheckYellow"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:contentDescription="Kuning"
+                        android:src="@drawable/ic_check"
+                        app:tint="@color/primary_green" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Green Circle -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardColorGreen"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="#BCE3C5"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@android:color/transparent"
+                    app:strokeWidth="0dp">
+
+                    <ImageView
+                        android:id="@+id/icCheckGreen"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:visibility="gone"
+                        android:contentDescription="Hijau"
+                        android:src="@drawable/ic_check"
+                        app:tint="@color/primary_green" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Blue Circle -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardColorBlue"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="#B8D8E9"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@android:color/transparent"
+                    app:strokeWidth="0dp">
+
+                    <ImageView
+                        android:id="@+id/icCheckBlue"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:visibility="gone"
+                        android:contentDescription="Biru"
+                        android:src="@drawable/ic_check"
+                        app:tint="@color/primary_green" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Pink Circle -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardColorPink"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="#ECC2C4"
+                    app:cardCornerRadius="18dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@android:color/transparent"
+                    app:strokeWidth="0dp">
+
+                    <ImageView
+                        android:id="@+id/icCheckPink"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:visibility="gone"
+                        android:contentDescription="Pink"
+                        android:src="@drawable/ic_check"
+                        app:tint="@color/primary_green" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Bottom Controller Bar (Dark Green Bar with 3 Buttons: Sorot | Catatan | Penanda) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/primary_green"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp">
+
+                <!-- Option 1: Sorot -->
+                <LinearLayout
+                    android:id="@+id/btnOptionHighlight"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/ivOptionHighlight"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginEnd="6dp"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:contentDescription="Sorot"
+                        android:src="@drawable/ic_highlighter"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvOptionHighlight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="Sorot"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <!-- Option 2: Catatan -->
+                <LinearLayout
+                    android:id="@+id/btnOptionNotes"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/ivOptionNotes"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginEnd="6dp"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:contentDescription="Catatan"
+                        android:src="@drawable/ic_note_edit"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvOptionNotes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="Catatan"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <!-- Option 3: Penanda -->
+                <LinearLayout
+                    android:id="@+id/btnOptionBookmark"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/ivOptionBookmark"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_marginEnd="6dp"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:contentDescription="Penanda"
+                        android:src="@drawable/ic_bookmark_check"
+                        app:tint="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tvOptionBookmark"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:text="Penanda"
+                        android:textColor="@color/white"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</RelativeLayout>

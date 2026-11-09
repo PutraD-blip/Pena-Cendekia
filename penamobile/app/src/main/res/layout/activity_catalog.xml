@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/katalog_buk"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_cream"
+    tools:context=".CatalogActivity">
+
+    <!-- Top App Header -->
+    <RelativeLayout
+        android:id="@+id/layoutCatalogHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/ivCatalogNotification"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lora"
+                android:text="Jelajahi koleksi"
+                android:textColor="@color/primary_green"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTotalCatalogSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/inter"
+                android:text="1.248 buku, seluas rasa ingin tahu."
+                android:textColor="@color/text_muted"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ivCatalogNotification"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Notifikasi"
+            android:padding="4dp"
+            android:src="@drawable/ic_notification"
+            app:tint="@color/primary_green" />
+
+    </RelativeLayout>
+
+    <!-- Bottom Navigation Bar -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationCatalog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/bg_cream"
+        app:elevation="8dp"
+        app:itemActiveIndicatorStyle="@style/Widget.PenaCendekia.BottomNavigationView.ActiveIndicator"
+        app:itemRippleColor="@color/nav_ripple_shadow"
+        app:itemIconTint="@color/bottom_nav_color_selector"
+        app:itemTextColor="@color/bottom_nav_color_selector"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_catalog_menu" />
+
+    <!-- Konten Halaman Scrollable -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomNavigationCatalog"
+        android:layout_below="@id/layoutCatalogHeader"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="4dp">
+
+            <!-- Search Bar Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSearchCatalog"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@color/card_bg"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/divider_color"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutCatalogSearchContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:contentDescription="Search"
+                        android:src="@drawable/ic_search"
+                        app:tint="@color/text_muted" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/inter"
+                        android:text="Cari judul, penulis, atau ISBN"
+                        android:textColor="@color/text_muted"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Title Section Kategori -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/lora"
+                android:text="Kategori buku"
+                android:textColor="@color/primary_green"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <!-- Category Chips Rows -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
+
+                <!-- Row 1 Chips -->
+                <com.example.penacendekia.ui.NestedHorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/chipSemua"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_chip_selected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Semua"
+                            android:textColor="@color/white"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chipEbook"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="E-Book"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chipPendidikan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Pendidikan"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipReferensi"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Referensi"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipSastra"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Sastra"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </com.example.penacendekia.ui.NestedHorizontalScrollView>
+
+                <!-- Row 2 Chips -->
+                <com.example.penacendekia.ui.NestedHorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/chipUmum"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Umum"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipAgama"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Agama"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipBukuAjar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Buku Ajar"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipKedokteranHewan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Kedokteran Hewan"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </com.example.penacendekia.ui.NestedHorizontalScrollView>
+
+                <!-- Row 3 Chips -->
+                <com.example.penacendekia.ui.NestedHorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/chipKesehatan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Kesehatan"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipTeknologi"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:fontFamily="@font/inter"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Teknologi"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/chipBisnis"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_chip_unselected"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="9dp"
+                            android:text="Bisnis dan Kewirausahaan"
+                            android:textColor="#4A554E"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </com.example.penacendekia.ui.NestedHorizontalScrollView>
+
+            </LinearLayout>
+
+            <!-- Sub-header Row: Total & Terpopuler -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvCatalogSectionSubtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/inter"
+                    android:text="Semua buku · 200+ judul"
+                    android:textColor="@color/text_muted"
+                    android:textSize="13sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:fontFamily="@font/inter"
+                        android:text="Terpopuler"
+                        android:textColor="@color/primary_green"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="14dp"
+                        android:contentDescription="Sort"
+                        android:src="@drawable/ic_sort"
+                        app:tint="@color/primary_green" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Dynamic Grid 3 Kolom Buku (Per-baris 3 buku) -->
+            <LinearLayout
+                android:id="@+id/layoutCatalogGridContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <!-- Empty State jika kategori kosong -->
+            <LinearLayout
+                android:id="@+id/layoutCatalogEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="36dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:contentDescription="Empty"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/text_muted" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/inter"
+                    android:text="Belum ada buku untuk kategori ini"
+                    android:textColor="@color/text_muted"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <!-- Bottom footer caption -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
+                android:fontFamily="@font/inter"
+                android:text="Pilihan baru ditambahkan setiap pekan."
+                android:textColor="@color/text_muted"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

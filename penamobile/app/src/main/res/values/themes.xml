@@ -1,0 +1,49 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PenaCendekia" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/primary_green</item>
+        <item name="colorSecondary">@color/accent_gold</item>
+        <item name="colorSecondaryContainer">@color/nav_indicator_shadow</item>
+        <item name="colorOnSecondaryContainer">@color/primary_green</item>
+        <item name="colorControlHighlight">@color/nav_ripple_shadow</item>
+        <item name="android:windowBackground">@color/bg_cream</item>
+        <item name="fontFamily">@font/inter</item>
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="android:windowAnimationStyle">@style/SmoothActivityAnimation</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowSharedElementsUseOverlay">true</item>
+        <item name="bottomNavigationStyle">@style/Widget.PenaCendekia.BottomNavigationView</item>
+    </style>
+
+    <style name="Theme.PenaCendekia" parent="Base.Theme.PenaCendekia" />
+
+    <style name="Widget.PenaCendekia.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemActiveIndicatorStyle">@style/Widget.PenaCendekia.BottomNavigationView.ActiveIndicator</item>
+        <item name="itemRippleColor">@color/nav_ripple_shadow</item>
+        <item name="itemIconTint">@color/bottom_nav_color_selector</item>
+        <item name="itemTextColor">@color/bottom_nav_color_selector</item>
+        <item name="android:background">@color/bg_cream</item>
+        <item name="elevation">8dp</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <style name="Widget.PenaCendekia.BottomNavigationView.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/nav_indicator_shadow</item>
+    </style>
+
+    <style name="SmoothActivityAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+        <item name="android:taskOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:taskOpenExitAnimation">@anim/slide_out_left</item>
+        <item name="android:taskCloseEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:taskCloseExitAnimation">@anim/slide_out_right</item>
+        <item name="android:taskToFrontEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:taskToFrontExitAnimation">@anim/slide_out_right</item>
+        <item name="android:taskToBackEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:taskToBackExitAnimation">@anim/slide_out_right</item>
+    </style>
+</resources>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_cream"
+    android:fillViewport="true"
+    android:isScrollContainer="true"
+    android:overScrollMode="never"
+    tools:context=".LoginActivity">
+
+    <LinearLayout
+        android:id="@+id/layoutLoginRoot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="36dp"
+        android:paddingBottom="24dp">
+
+        <!-- Top App Title (Lora Bold) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/lora"
+            android:text="Pena Cendekia Pustaka"
+            android:textColor="@color/primary_green"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/inter"
+            android:letterSpacing="0.25"
+            android:text="E-LIBRARY"
+            android:textColor="@color/text_muted"
+            android:textSize="11sp" />
+
+        <!-- Center Illustration -->
+        <ImageView
+            android:layout_width="300dp"
+            android:layout_height="270dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:contentDescription="Ilustrasi Pena Cendekia Pustaka"
+            android:src="@drawable/il_login_hero" />
+
+        <!-- Main Headline (Lora Bold) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/lora"
+            android:gravity="center"
+            android:lineSpacingExtra="2sp"
+            android:text="Akses Ribuan Buku &amp;&#10;Karya Akademis"
+            android:textColor="@color/primary_green"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <!-- Sub-headline Description (Inter Regular) -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/inter"
+            android:gravity="center"
+            android:lineSpacingExtra="4sp"
+            android:paddingHorizontal="16dp"
+            android:text="Nikmati Sesi Baca 7 Hari, simpan catatan, dan berikan ulasan dengan 1-click login."
+            android:textColor="@color/text_muted"
+            android:textSize="14sp" />
+
+        <!-- Flexible Spacer -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="32dp" />
+
+        <!-- Google Login Button (Inter Bold) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnGoogleLogin"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardBackgroundColor="@color/card_bg"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:contentDescription="Google Logo"
+                    android:src="@drawable/ic_google_logo" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:fontFamily="@font/inter"
+                    android:text="Lanjutkan dengan Google"
+                    android:textColor="@color/text_dark"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Author / Penulis Login Alternative Option (Inter Bold) -->
+        <TextView
+            android:id="@+id/btnAuthorEmailLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/inter"
+            android:padding="8dp"
+            android:text="Atau Masuk dengan Akun Penulis (Email &amp; Sandi)"
+            android:textColor="@color/primary_green"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <!-- Forgot Password Link -->
+        <TextView
+            android:id="@+id/tvForgotPasswordMain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/inter"
+            android:padding="6dp"
+            android:text="Lupa Kata Sandi?"
+            android:textColor="@color/accent_gold"
+            android:textSize="12.5sp"
+            android:textStyle="bold" />
+
+        <!-- Register Account Link -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:text="Belum punya akun e-book? "
+                android:textColor="@color/text_muted"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/btnGoToRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/inter"
+                android:padding="4dp"
+                android:text="Daftar di sini"
+                android:textColor="@color/primary_green"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Terms and Privacy Footer (Inter Regular) -->
+        <TextView
+            android:id="@+id/tvTermsFooter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="@font/inter"
+            android:gravity="center"
+            android:lineSpacingExtra="3sp"
+            android:paddingHorizontal="8dp"
+            android:text="Dengan melanjutkan, Anda menyetujui Syarat &amp; Ketentuan serta Kebijakan Privasi Pena Cendekia."
+            android:textColor="@color/text_muted"
+            android:textSize="11.5sp" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

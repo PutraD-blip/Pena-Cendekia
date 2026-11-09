@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutReaderRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_cream"
+    tools:context=".ReaderActivity">
+
+    <!-- Top Header Bar -->
+    <LinearLayout
+        android:id="@+id/toolbarReader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="12dp">
+
+        <ImageView
+            android:id="@+id/btnBackReader"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Kembali"
+            android:padding="4dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/primary_green" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvReaderBookTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Digitalisasi Pendidikan Islam"
+                android:textColor="@color/primary_green"
+                android:textSize="18sp"
+                android:fontFamily="@font/lora"
+                app:fontFamily="@font/lora"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvReaderBookAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Dr. Hj. Siti Yumnah, M.Pd.I, Muhammad Sulaiman..."
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:fontFamily="@font/inter"
+                app:fontFamily="@font/inter" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btnBookmarkReader"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Bookmark"
+            android:padding="4dp"
+            android:src="@drawable/ic_bookmark_check"
+            app:tint="@color/primary_green" />
+
+    </LinearLayout>
+
+    <!-- Bottom Controls Container -->
+    <LinearLayout
+        android:id="@+id/layoutReaderBottomControls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/bg_cream"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
+
+        <!-- Progress Status Row (Scroll Mode + Progress Percentage) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvReaderScrollMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:text="Gulir Vertikal"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tvReaderProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter"
+                android:text="0% dibaca"
+                android:textColor="@color/primary_green"
+                android:textSize="12.5sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Reading Progress Line -->
+        <ProgressBar
+            android:id="@+id/readerProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_marginBottom="12dp"
+            android:max="100"
+            android:progress="0"
+            android:progressBackgroundTint="@color/card_cream"
+            android:progressTint="@color/primary_green" />
+
+        <!-- Divider Line -->
+        <View
+            android:id="@+id/dividerReaderBottom"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/divider_color" />
+
+        <!-- Tools Row: Daftar isi, Tampilan, Catatan -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- Daftar isi -->
+            <LinearLayout
+                android:id="@+id/btnToc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:id="@+id/ivTocIcon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Daftar Isi"
+                    android:src="@drawable/ic_list_format"
+                    app:tint="@color/primary_green" />
+
+                <TextView
+                    android:id="@+id/tvTocLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Daftar isi"
+                    android:textColor="@color/primary_green"
+                    android:textSize="12.5sp" />
+
+            </LinearLayout>
+
+            <!-- Tampilan -->
+            <LinearLayout
+                android:id="@+id/btnAppearance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:id="@+id/ivAppearanceIcon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Tampilan"
+                    android:src="@drawable/ic_text_format"
+                    app:tint="@color/primary_green" />
+
+                <TextView
+                    android:id="@+id/tvAppearanceLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tampilan"
+                    android:textColor="@color/primary_green"
+                    android:textSize="12.5sp" />
+
+            </LinearLayout>
+
+            <!-- Catatan -->
+            <LinearLayout
+                android:id="@+id/btnNotes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:id="@+id/ivNotesIcon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Catatan"
+                    android:src="@drawable/ic_note_edit"
+                    app:tint="@color/primary_green" />
+
+                <TextView
+                    android:id="@+id/tvNotesLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Catatan"
+                    android:textColor="@color/primary_green"
+                    android:textSize="12.5sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Reading Content Scroll View -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollViewReader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutReaderBottomControls"
+        android:layout_below="@id/toolbarReader"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:id="@+id/layoutReaderContentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="8dp">
+
+            <!-- Admin File Info Card (Integrated with Uploaded Document) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardFileInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#E8F2EC"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/divider_color"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_marginEnd="6dp"
+                            android:contentDescription="Dokumen"
+                            android:src="@drawable/ic_book_open"
+                            app:tint="@color/primary_green" />
+
+                        <TextView
+                            android:id="@+id/tvFileInfoBadge"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/inter"
+                            android:text="E-Book Resmi Terbitan Web Pena Cendekia"
+                            android:textColor="@color/primary_green"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvFileInfoDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/inter"
+                        android:text="Format PDF / E-Pub • Terverifikasi Admin"
+                        android:textColor="@color/text_muted"
+                        android:textSize="11.5sp" />
+
+                    <TextView
+                        android:id="@+id/btnOpenOriginalDoc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:fontFamily="@font/inter"
+                        android:paddingVertical="2dp"
+                        android:text="📄 Buka / Unduh Berkas E-Book Asli ➔"
+                        android:textColor="@color/primary_green"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Chapter Subtitle: BAB 1 -->
+            <TextView
+                android:id="@+id/tvChapterNum"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="BAB 1"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Chapter Title -->
+            <TextView
+                android:id="@+id/tvChapterTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:text="Konsep &amp; Strategi Pendidikan Islam Abad 21"
+                android:textColor="@color/primary_green"
+                android:textSize="24sp"
+                android:fontFamily="@font/lora"
+                app:fontFamily="@font/lora"
+                android:textStyle="bold" />
+
+            <!-- Paragraph 1 -->
+            <TextView
+                android:id="@+id/tvParagraph1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:lineSpacingExtra="6sp"
+                android:fontFamily="@font/lora"
+                app:fontFamily="@font/lora"
+                android:text="Pengembangan lembaga pendidikan Islam yang unggul membutuhkan integrasi strategis antara nilai-nilai keilmuan Islam (turats) dengan literasi teknologi digital abad ke-21. Tenaga pendidik madrasah dan perguruan tinggi Islam diarahkan untuk memanfaatkan media digital secara adaptif guna mewujudkan proses pembelajaran yang transformatif dan inklusif."
+                android:textColor="@color/text_dark"
+                android:textSize="15sp" />
+
+            <!-- Paragraph 2 -->
+            <TextView
+                android:id="@+id/tvParagraph2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:lineSpacingExtra="6sp"
+                android:fontFamily="@font/lora"
+                app:fontFamily="@font/lora"
+                android:text="Implementasi pembelajaran berbasis digital bukan sekadar konversi materi teks ke bentuk digital, melainkan restrukturisasi metodologi pengajaran yang berpusat pada penguatan nalar kritis, akhlak karimah, dan kesiapan siswa menghadapi dinamika global yang serba cepat. Penjaminan mutu berkelanjutan menjadi kunci keberhasilan transformasi pendidikan Islam di seluruh nusantara."
+                android:textColor="@color/text_dark"
+                android:textSize="15sp" />
+
+            <!-- Paragraph 3 / Synopsis Content -->
+            <TextView
+                android:id="@+id/tvParagraph3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:lineSpacingExtra="6sp"
+                android:fontFamily="@font/lora"
+                app:fontFamily="@font/lora"
+                android:text="Karya ini disusun secara komprehensif untuk memberikan panduan teoritis maupun praktis bagi para pendidik, pimpinan institusi pendidikan, akademisi, dan mahasiswa dalam merespons tantangan revolusi industri serta era disrupsi informasi dengan tetap mempertahankan jati diri luhur peradaban bangsa."
+                android:textColor="@color/text_dark"
+                android:textSize="15sp" />
+
+            <!-- Reading End Footer -->
+            <TextView
+                android:id="@+id/tvReaderFooter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:gravity="center"
+                android:fontFamily="@font/inter"
+                android:text="— Akhir dari Pratinjau Bab • PT Pena Cendekia Pustaka —"
+                android:textColor="@color/text_muted"
+                android:textSize="11.5sp" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>
