@@ -21,7 +21,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toStartOf="@id/btnSettingsProfile"
             android:orientation="vertical">
 
             <TextView
@@ -42,18 +41,6 @@
                 android:textColor="@color/text_muted"
                 android:textSize="12sp" />
         </LinearLayout>
-
-        <ImageView
-            android:id="@+id/btnSettingsProfile"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Pengaturan"
-            android:padding="6dp"
-            android:src="@drawable/ic_settings"
-            app:tint="@color/primary_green" />
 
     </RelativeLayout>
 
@@ -130,10 +117,10 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:fontFamily="@font/lora"
-                            android:text="AP"
                             android:textColor="@color/primary_green"
                             android:textSize="20sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="U" />
 
                     </com.google.android.material.card.MaterialCardView>
 
@@ -149,10 +136,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter"
-                            android:text="Alya Putri"
                             android:textColor="@color/primary_green"
                             android:textSize="17sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="Nama Pengguna" />
 
                         <TextView
                             android:id="@+id/tvProfileEmail"
@@ -162,9 +149,9 @@
                             android:ellipsize="end"
                             android:fontFamily="@font/inter"
                             android:maxLines="1"
-                            android:text="alya.putri@penacendekia.id"
                             android:textColor="@color/text_muted"
-                            android:textSize="12.5sp" />
+                            android:textSize="12.5sp"
+                            tools:text="email@domain.com" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -245,7 +232,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter"
-                            android:text="18"
+                            android:text="0"
                             android:textColor="@color/primary_green"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -291,7 +278,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter"
-                            android:text="5"
+                            android:text="0"
                             android:textColor="@color/primary_green"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -337,7 +324,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter"
-                            android:text="3"
+                            android:text="0"
                             android:textColor="@color/primary_green"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -433,10 +420,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter"
-                            android:text="Alya Putri"
                             android:textColor="@color/white"
                             android:textSize="16sp"
-                            android:textStyle="bold" />
+                            android:textStyle="bold"
+                            tools:text="Nama Pengguna" />
 
                         <TextView
                             android:id="@+id/tvCardMemberId"
@@ -444,9 +431,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/inter"
-                            android:text="ID: PCM-MOB-2026-008721 • Ketuk info"
                             android:textColor="#C2D6CC"
-                            android:textSize="11.5sp" />
+                            android:textSize="11.5sp"
+                            tools:text="ID: PCM-MOB-2026-000000 • Ketuk info" />
 
                     </LinearLayout>
 

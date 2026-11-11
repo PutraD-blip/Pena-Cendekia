@@ -1,8 +1,56 @@
 package com.example.penacendekia.data.repository
 
+import android.content.Context
+import com.example.penacendekia.R
+import com.example.penacendekia.data.cache.AppDiskCache
 import com.example.penacendekia.data.model.Book
+import com.example.penacendekia.data.model.HomeData
 
 object BookCatalogRepository {
+
+    // In-memory cache agar perpindahan antar tab Beranda & Katalog berjalan instan (0 detik tanpa jeda network)
+    var cachedHomeData: HomeData? = null
+    var cachedServerBooks: List<Book>? = null
+
+    /**
+     * Memuat HomeData dari RAM, atau dari disk (SharedPreferences) jika aplikasi baru saja dibuka ulang.
+     */
+    fun getOrLoadHomeData(context: Context): HomeData? {
+        if (cachedHomeData != null) return cachedHomeData
+        val diskData = AppDiskCache.getHomeData(context)
+        if (diskData != null) {
+            cachedHomeData = diskData
+        }
+        return cachedHomeData
+    }
+
+    /**
+     * Menyimpan HomeData ke RAM dan persistensi disk secara otomatis.
+     */
+    fun setHomeData(context: Context, data: HomeData) {
+        cachedHomeData = data
+        AppDiskCache.saveHomeData(context, data)
+    }
+
+    /**
+     * Memuat buku katalog dari RAM atau dari disk.
+     */
+    fun getOrLoadCatalogBooks(context: Context): List<Book>? {
+        if (cachedServerBooks != null) return cachedServerBooks
+        val diskBooks = AppDiskCache.getCatalogBooks(context)
+        if (diskBooks != null) {
+            cachedServerBooks = diskBooks
+        }
+        return cachedServerBooks
+    }
+
+    /**
+     * Menyimpan buku katalog ke RAM dan disk.
+     */
+    fun setCatalogBooks(context: Context, books: List<Book>) {
+        cachedServerBooks = books
+        AppDiskCache.saveCatalogBooks(context, books)
+    }
 
     val ALL_11_BOOKS: List<Book> = listOf(
         Book(
@@ -19,6 +67,7 @@ object BookCatalogRepository {
             pages = "xii + 216 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Membahas konsep dan strategi kepemimpinan visioner dalam mentransformasi lembaga pendidikan Islam agar memiliki keunggulan kompetitif, integrasi nilai moderasi beragama, serta kapabilitas tata kelola modern di era digital.",
+            coverResId = R.drawable.img_kepemimpinan_visioner_cover,
             rating = 4.9,
             rating_count = 128,
             price = 59000.0,
@@ -40,6 +89,7 @@ object BookCatalogRepository {
             pages = "xii + 230 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Panduan terapan integrasi teknologi digital dalam pengajaran pendidikan Islam. Membahas model blended learning, pemanfaatan AI dalam madrasah, pengembangan e-modul interaktif, hingga kesiapan literasi digital para pendidik.",
+            coverResId = R.drawable.img_digitalisasi_pendidikan_islam_cover,
             rating = 5.0,
             rating_count = 142,
             price = 0.0,
@@ -61,6 +111,7 @@ object BookCatalogRepository {
             pages = "xii + 214 hlm",
             size = "15.5 x 23 cm (UNESCO)",
             synopsis = "Buku ajar komprehensif yang dirancang untuk akademisi, mahasiswa, dan praktisi manajemen informasi kesehatan. Membedah tata kelola rekam medis manual hingga Rekam Medis Elektronik (RME) modern, kerahasiaan data pasien, standar akreditasi rumah sakit, serta sistem klasifikasi kodefikasi klinis.",
+            coverResId = R.drawable.img_administrasi_rekam_medis,
             rating = 4.9,
             rating_count = 98,
             price = 65000.0,
@@ -82,6 +133,7 @@ object BookCatalogRepository {
             pages = "x + 184 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Buku ajar bahasa Inggris spesifik untuk bidang akuntansi dan keuangan, memuat kosakata profesional, penyusunan laporan keuangan internasional, analisis neraca, hingga simulasi presentasi bisnis global.",
+            coverResId = R.drawable.img_foundation_english_for_accounting,
             rating = 4.8,
             rating_count = 85,
             price = 49000.0,
@@ -103,6 +155,7 @@ object BookCatalogRepository {
             pages = "xiv + 208 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Mengkaji paradigma teori belajar behavioristik, kognitif, konstruktivistik, dan humanistik yang diadaptasi secara khusus untuk kurikulum dan karakteristik peserta didik tingkat sekolah dasar guna mewujudkan proses pembelajaran yang bermakna dan berkualitas.",
+            coverResId = R.drawable.img_konstruksi_teori_belajar_pendidikan_dasar,
             rating = 4.9,
             rating_count = 110,
             price = 55000.0,
@@ -124,6 +177,7 @@ object BookCatalogRepository {
             pages = "x + 196 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Memberikan panduan operasional dalam mengelola hubungan masyarakat di lingkungan sekolah, strategi pencitraan positif, penanganan krisis reputasi, hingga optimalisasi media sosial sekolah sebagai sarana komunikasi publik yang efektif.",
+            coverResId = R.drawable.img_manajemen_humas,
             rating = 4.8,
             rating_count = 76,
             price = 52000.0,
@@ -145,6 +199,7 @@ object BookCatalogRepository {
             pages = "xvi + 234 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Cacing, Protozoa, dan Penyakit Nutrisi pada Peternakan Unggas sebagai Dasar Studi Embrio Hewan memberikan kajian menyeluruh tentang gangguan parasit dan nutrisi yang secara signifikan memengaruhi kesehatan dan perkembangan unggas.",
+            coverResId = R.drawable.img_penyakit_cacing,
             rating = 5.0,
             rating_count = 92,
             price = 72000.0,
@@ -166,6 +221,7 @@ object BookCatalogRepository {
             pages = "xii + 198 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Buku panduan dasar jurnalistik mencakup kaidah penulisan berita, wawancara investigatif, kode etik jurnalistik, dan strategi adaptasi reporter dalam era jurnalisme digital multiplatform.",
+            coverResId = R.drawable.img_pengantar_jurnalistik,
             rating = 4.9,
             rating_count = 104,
             price = 48000.0,
@@ -187,6 +243,7 @@ object BookCatalogRepository {
             pages = "xiv + 240 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Membahas model Sistem Penjaminan Mutu Internal (SPMI) yang dikontekstualisasikan untuk kultur pesantren dan madrasah, penetapan standar mutu lulusan, akreditasi, dan audit mutu akademik berkelanjutan.",
+            coverResId = R.drawable.img_penjaminan_mutu,
             rating = 4.9,
             rating_count = 88,
             price = 60000.0,
@@ -208,6 +265,7 @@ object BookCatalogRepository {
             pages = "xii + 224 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Kajian multidisipliner tentang lima prinsip kebebasan hewan (Five Freedoms), etika biomedis perlakuan hewan uji laboratorium, serta regulasi standar kesejahteraan ternak komersial dalam rantai pasok pangan hewani.",
+            coverResId = R.drawable.img_animal_welfare_perspective,
             rating = 5.0,
             rating_count = 79,
             price = 68000.0,
@@ -229,6 +287,7 @@ object BookCatalogRepository {
             pages = "xii + 210 hlm",
             size = "15.5 x 23 cm",
             synopsis = "Eksplorasi komprehensif mengenai keunikan fisiologis, sistem imun spesifik (nanobody), dan biologi adaptasi gurun unta, serta implikasi mutakhirnya dalam riset embriologi dan kedokteran komparatif internasional.",
+            coverResId = R.drawable.img_camel_animal_perspective,
             rating = 4.9,
             rating_count = 83,
             price = 68000.0,
@@ -269,19 +328,27 @@ object BookCatalogRepository {
     }
 
     fun enrichBook(book: Book): Book {
+        val matchedCover = com.example.penacendekia.BookCoverResolver.localCoverByTitle(book.title)
         val known = ALL_11_BOOKS.find {
             normalizeTitle(it.title) == normalizeTitle(book.title) ||
                 normalizeTitle(it.title).contains(normalizeTitle(book.title)) ||
                 normalizeTitle(book.title).contains(normalizeTitle(it.title))
-        } ?: return book.copy(
-            type = "ebook",
-            category = if (book.category.isNullOrBlank()) "E-Book" else if (!book.category.contains("E-Book", ignoreCase = true)) "E-Book · ${book.category}" else book.category
-        )
+        }
+        val coverRes = matchedCover ?: known?.coverResId
+
+        if (known == null) {
+            return book.copy(
+                type = "ebook",
+                coverResId = coverRes,
+                category = if (book.category.isNullOrBlank()) "E-Book" else if (!book.category.contains("E-Book", ignoreCase = true)) "E-Book · ${book.category}" else book.category
+            )
+        }
 
         val resolvedCategory = known.category ?: if (book.category.isNullOrBlank()) "E-Book" else if (!book.category.contains("E-Book", ignoreCase = true)) "E-Book · ${book.category}" else book.category
 
         return book.copy(
             type = "ebook",
+            coverResId = coverRes,
             subtitle = book.subtitle.takeUnless { it.isNullOrBlank() } ?: known.subtitle,
             author = book.author.takeUnless { it.isBlank() } ?: known.author,
             editor = book.editor.takeUnless { it.isNullOrBlank() } ?: known.editor,
@@ -295,7 +362,12 @@ object BookCatalogRepository {
             rating = if (book.rating > 0) book.rating else known.rating,
             rating_count = if (book.rating_count > 0) book.rating_count else known.rating_count,
             price = if (book.price > 0) book.price else known.price,
-            formatted_price = book.formatted_price.takeUnless { it.isNullOrBlank() } ?: known.formatted_price
+            formatted_price = book.formatted_price.takeUnless { it.isNullOrBlank() } ?: known.formatted_price,
+            file_url = book.file_url ?: known.file_url,
+            download_url = book.download_url ?: known.download_url,
+            sample_url = book.sample_url ?: known.sample_url,
+            cover_url = book.cover_url ?: known.cover_url,
+            is_free = if (book.price > 0) false else book.is_free
         )
     }
 

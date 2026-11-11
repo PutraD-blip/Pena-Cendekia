@@ -59,7 +59,8 @@
                         <!-- Penulis -->
                         <div class="col-md-7">
                             <label for="author" class="form-label">Penulis / Tim Penulis <span class="text-danger">*</span></label>
-                            <input type="text" name="author" id="author" class="form-control @error('author') is-invalid @enderror" placeholder="Contoh: Dr. H. Ahmad Fauzi, M.Kes" value="{{ old('author', $ebook->author) }}" required>
+                            <input type="text" name="author" id="author" class="form-control @error('author') is-invalid @enderror" placeholder="Contoh: Dr. H. Ahmad Fauzi, M.Kes" value="{{ old('author', $ebook->author) }}" maxlength="500" required>
+                            <small class="text-muted" style="font-size: 11px;">Maksimal 500 karakter</small>
                             @error('author') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
 
@@ -321,6 +322,18 @@
             wrapper.style.display = 'block';
         }
     }
+
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        el.addEventListener('input', () => {
+            if (el.classList.contains('is-invalid')) {
+                el.classList.remove('is-invalid');
+                const next = el.nextElementSibling;
+                if (next && next.classList.contains('text-danger')) {
+                    next.style.display = 'none';
+                }
+            }
+        });
+    });
 </script>
 @endpush
 @endsection

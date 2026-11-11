@@ -39,7 +39,11 @@ class NotificationActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.toolbarNotification)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(v.paddingLeft, systemBars.top, v.paddingRight, v.paddingBottom)
+            val lp = v.layoutParams as? android.view.ViewGroup.MarginLayoutParams
+            if (lp != null && lp.topMargin != systemBars.top) {
+                lp.topMargin = systemBars.top
+                v.layoutParams = lp
+            }
             insets
         }
 
@@ -90,36 +94,7 @@ class NotificationActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<ApiResponse<List<NotificationItem>>>, t: Throwable) {
                 pbLoading.visibility = View.GONE
-                // Fallback dummy notification jika offline
-                val dummyNotifs = listOf(
-                    NotificationItem(
-                        id = 1,
-                        book_id = 1,
-                        title = "E-Book Baru Dirilis: Digitalisasi Pendidikan Islam",
-                        message = "Karya terbaru oleh Dr. Hj. Siti Yumnah, M.Pd.I kini resmi tersedia di perpustakaan digital.",
-                        author = "Dr. Hj. Siti Yumnah, M.Pd.I",
-                        category = "E-Book · Teknologi",
-                        cover_url = null,
-                        date = "Hari ini",
-                        type = "new_book"
-                    ),
-                    NotificationItem(
-                        id = 2,
-                        book_id = 2,
-                        title = "E-Book Baru Dirilis: Administrasi Rekam Medis",
-                        message = "Buku teks kesehatan terbaru oleh Dr. Aries Wahyuningsih telah ditambahkan ke katalog.",
-                        author = "Dr. Aries Wahyuningsih",
-                        category = "E-Book · Kesehatan",
-                        cover_url = null,
-                        date = "Kemarin",
-                        type = "new_book"
-                    )
-                )
-                dummyNotifs.forEachIndexed { index, notif ->
-                    val card = createNotificationCard(notif)
-                    layoutList.addView(card)
-                    PageTransition.animateViewIn(card, delayMs = index * 40L)
-                }
+                layoutEmpty.visibility = View.VISIBLE
             }
         })
     }
@@ -157,15 +132,7 @@ class NotificationActivity : AppCompatActivity() {
             setBackgroundResource(R.drawable.bg_filter_box)
         }
 
-        val fallback = when {
-            notif.title.contains("administrasi", ignoreCase = true) -> R.drawable.img_administrasi_cover
-            notif.title.contains("cacing", ignoreCase = true) -> R.drawable.img_penyakit_cacing
-            notif.title.contains("jurnalistik", ignoreCase = true) -> R.drawable.img_pengantar_jurnalistik
-            else -> R.drawable.img_digitalisasi_cover
-        }
-
-        val coverUrl = RetrofitClient.getFormattedImageUrl(notif.cover_url)
-        Glide.with(this).load(coverUrl ?: fallback).placeholder(fallback).error(fallback).into(ivCover)
+        BookCoverResolver.loadCover(ivCover, notif.title, notif.cover_url)
 
         // Text content
         val colText = LinearLayout(this).apply {

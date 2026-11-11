@@ -1,5 +1,6 @@
 package com.example.penacendekia
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -32,9 +33,20 @@ class CatalogActivity : AppCompatActivity() {
         private const val TAG = "CatalogActivity"
     }
 
+    enum class SortType(val label: String) {
+        POPULAR("Terpopuler"),
+        NEWEST("Terbaru"),
+        OLDEST("Terlama")
+    }
+
     private lateinit var bottomNav: BottomNavigationView
     private var activeCategory: String? = null
     private var categoryChips: List<TextView> = emptyList()
+    private var currentSort: SortType = SortType.POPULAR
+    private var rawCatalogBooks: List<Book> = emptyList()
+    private var renderedCatalogIds: List<Int> = emptyList()
+    private var renderedCatalogSort: SortType? = null
+    private var renderedCatalogCategory: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +64,16 @@ class CatalogActivity : AppCompatActivity() {
         }
         findViewById<View>(R.id.cardSearchCatalog)?.setOnClickListener(openSearch)
         findViewById<View>(R.id.layoutCatalogSearchContent)?.setOnClickListener(openSearch)
+
+        // Notification icon opens NotificationActivity (sama seperti di beranda/home)
+        findViewById<View>(R.id.ivCatalogNotification)?.setOnClickListener {
+            PageTransition.slideForward(this, Intent(this, NotificationActivity::class.java))
+        }
+
+        // Fitur Filter / Urutkan Buku (Terpopuler, Terbaru, Terlama)
+        findViewById<View>(R.id.btnSortCatalog)?.setOnClickListener {
+            showSortDialog()
+        }
 
         bottomNav = findViewById(R.id.bottomNavigationCatalog)
 
@@ -81,8 +103,20 @@ class CatalogActivity : AppCompatActivity() {
         // Setup Interactive Category Chips
         setupCategoryChips()
 
-        // Setup fallback default clicks immediately
-        setupFallbackClicks()
+        // Handle Back button to return to Beranda
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                PageTransition.switchTab(this@CatalogActivity, MainActivity::class.java)
+            }
+        })
+
+        // Check cache first (RAM -> Disk) to avoid waiting or visual flickering
+        val cached = BookCatalogRepository.getOrLoadCatalogBooks(this)
+        if (cached != null) {
+            bindCatalogBooks(mergeWithLocalBooks(cached, activeCategory))
+        } else {
+            setupFallbackClicks()
+        }
 
         // Check if intent specified a category (e.g. "E-Book" from Home)
         val initialCategory = intent.getStringExtra("CATEGORY_FILTER")
@@ -143,12 +177,16 @@ class CatalogActivity : AppCompatActivity() {
     }
 
     private fun fetchCatalogBooks(category: String? = null) {
-        val localBooks = BookCatalogRepository.getBooks(category)
+        val cached = BookCatalogRepository.getOrLoadCatalogBooks(this)
+        if (cached != null) {
+            bindCatalogBooks(mergeWithLocalBooks(cached, category))
+        } else {
+            val localBooks = BookCatalogRepository.getBooks(category)
+            bindCatalogBooks(localBooks)
+        }
+
         val typeQuery = if (category.equals("E-Book", ignoreCase = true)) "ebook" else null
         val categoryQuery = if (category.equals("E-Book", ignoreCase = true)) null else category
-
-        // Tampilkan langsung 11 buku lokal sesuai kategori agar instan dan responsif
-        bindCatalogBooks(localBooks)
 
         RetrofitClient.apiService.getBooks(category = categoryQuery, type = typeQuery).enqueue(object : Callback<ApiResponse<List<Book>>> {
             override fun onResponse(call: Call<ApiResponse<List<Book>>>, response: Response<ApiResponse<List<Book>>>) {
@@ -156,6 +194,7 @@ class CatalogActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val serverBooks = response.body()?.data.orEmpty()
                     Log.i(TAG, "Loaded ${serverBooks.size} books from server for category: $category")
+                    BookCatalogRepository.setCatalogBooks(this@CatalogActivity, serverBooks)
                     val mergedBooks = mergeWithLocalBooks(serverBooks, category)
                     bindCatalogBooks(mergedBooks)
                 } else {
@@ -165,7 +204,6 @@ class CatalogActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<ApiResponse<List<Book>>>, t: Throwable) {
                 Log.e(TAG, "Failed connecting to server for catalog: ${t.message}", t)
-                // localBooks sudah ditampilkan
             }
         })
     }
@@ -187,7 +225,58 @@ class CatalogActivity : AppCompatActivity() {
     private fun normalizeTitle(text: String): String =
         text.lowercase().replace(Regex("[^a-z0-9]"), "")
 
+    private fun showSortDialog() {
+        val options = arrayOf("Terpopuler", "Terbaru", "Terlama")
+        val currentIndex = when (currentSort) {
+            SortType.POPULAR -> 0
+            SortType.NEWEST -> 1
+            SortType.OLDEST -> 2
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Urutkan Katalog")
+            .setSingleChoiceItems(options, currentIndex) { dialog, which ->
+                val chosen = when (which) {
+                    0 -> SortType.POPULAR
+                    1 -> SortType.NEWEST
+                    2 -> SortType.OLDEST
+                    else -> SortType.POPULAR
+                }
+                currentSort = chosen
+                applySortAndRender()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batal", null)
+            .show()
+    }
+
     private fun bindCatalogBooks(books: List<Book>) {
+        rawCatalogBooks = books
+        applySortAndRender()
+    }
+
+    private fun applySortAndRender() {
+        findViewById<TextView>(R.id.tvCurrentSortLabel)?.text = currentSort.label
+
+        val sortedBooks = when (currentSort) {
+            SortType.POPULAR -> {
+                // Urutkan berdasarkan rating tertinggi (5.0, 4.9, 4.8 ...)
+                rawCatalogBooks.sortedByDescending { it.rating }
+            }
+            SortType.NEWEST -> {
+                // Buku terbaru (upload terkini di paling atas)
+                rawCatalogBooks.sortedByDescending { it.id }
+            }
+            SortType.OLDEST -> {
+                // Buku terlama (upload paling awal di paling atas)
+                rawCatalogBooks.sortedBy { it.id }
+            }
+        }
+
+        renderCatalogGrid(sortedBooks)
+    }
+
+    private fun renderCatalogGrid(books: List<Book>) {
         val totalCount = books.size
         val subtitle = when {
             activeCategory.equals("E-Book", ignoreCase = true) -> "$totalCount e-book digital terdaftar di katalog."
@@ -198,6 +287,15 @@ class CatalogActivity : AppCompatActivity() {
 
         val container = findViewById<LinearLayout>(R.id.layoutCatalogGridContainer) ?: return
         val emptyState = findViewById<View>(R.id.layoutCatalogEmptyState)
+
+        val currentIds = books.map { it.id }
+        if (currentIds == renderedCatalogIds && currentSort == renderedCatalogSort && activeCategory == renderedCatalogCategory && container.childCount > 0) {
+            return
+        }
+        renderedCatalogIds = currentIds
+        renderedCatalogSort = currentSort
+        renderedCatalogCategory = activeCategory
+
         container.removeAllViews()
 
         if (books.isEmpty()) {
@@ -263,18 +361,7 @@ class CatalogActivity : AppCompatActivity() {
             contentDescription = book.title
         }
 
-        val formattedUrl = RetrofitClient.getFormattedImageUrl(book.cover_url)
-        val localCover = BookCoverResolver.localCover(book)
-        val placeholder = BookCoverResolver.placeholder(book)
-        try {
-            Glide.with(this)
-                .load(formattedUrl ?: localCover ?: placeholder)
-                .placeholder(placeholder)
-                .error(placeholder)
-                .into(ivCover)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        BookCoverResolver.loadCover(ivCover, book)
         frame.addView(ivCover)
 
         // Overlay Badge "E-BOOK" di pojok kiri atas
@@ -365,12 +452,21 @@ class CatalogActivity : AppCompatActivity() {
         PageTransition.slideForward(this, intent)
     }
 
+    private var lastCatalogLoadTime: Long = 0L
+
     override fun onResume() {
         super.onResume()
         if (::bottomNav.isInitialized) {
             bottomNav.selectedItemId = R.id.nav_katalog
         }
-        // Refresh catalog books when resuming
-        fetchCatalogBooks(activeCategory)
+        val cached = BookCatalogRepository.getOrLoadCatalogBooks(this)
+        if (cached != null) {
+            bindCatalogBooks(mergeWithLocalBooks(cached, activeCategory))
+        }
+        // Refresh catalog books silently in background
+        if (System.currentTimeMillis() - lastCatalogLoadTime > 2500L) {
+            lastCatalogLoadTime = System.currentTimeMillis()
+            fetchCatalogBooks(activeCategory)
+        }
     }
 }

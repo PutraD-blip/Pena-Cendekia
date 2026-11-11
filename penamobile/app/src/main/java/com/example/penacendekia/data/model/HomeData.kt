@@ -5,6 +5,7 @@ data class HomeData(
     val banners: List<BannerItem>? = null,
     val popular_books: List<Book>? = null,
     val latest_book: Book? = null,
+    val latest_books: List<Book>? = null,
     val editor_pick: Book? = null,
     val ebooks: List<Book>? = null,
     val total_books: Int = 0,

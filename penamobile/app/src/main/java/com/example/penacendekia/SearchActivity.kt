@@ -42,7 +42,11 @@ class SearchActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutSearchHeader)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(v.paddingLeft, systemBars.top, v.paddingRight, v.paddingBottom)
+            val lp = v.layoutParams as? android.view.ViewGroup.MarginLayoutParams
+            if (lp != null && lp.topMargin != systemBars.top) {
+                lp.topMargin = systemBars.top
+                v.layoutParams = lp
+            }
             insets
         }
 
@@ -259,27 +263,8 @@ class SearchActivity : AppCompatActivity() {
     private fun fallbackBooks(): List<Book> = BookCatalogRepository.ALL_11_BOOKS
 
     private fun loadBookCover(imageView: ImageView?, book: Book) {
-        val localCover = BookCoverResolver.localCover(book)
         if (imageView == null || isFinishing || isDestroyed) return
-        if (localCover != null) {
-            Glide.with(this).load(localCover).into(imageView)
-        } else {
-            loadCover(imageView, book.cover_url, BookCoverResolver.placeholder(book))
-        }
-    }
-
-    private fun loadCover(imageView: ImageView?, url: String?, placeholderRes: Int) {
-        if (imageView == null || isFinishing || isDestroyed) return
-        val formattedUrl = RetrofitClient.getFormattedImageUrl(url)
-        try {
-            Glide.with(this)
-                .load(formattedUrl ?: placeholderRes)
-                .placeholder(placeholderRes)
-                .error(placeholderRes)
-                .into(imageView)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        BookCoverResolver.loadCover(imageView, book)
     }
 
     private fun openBookDetail(book: Book) {

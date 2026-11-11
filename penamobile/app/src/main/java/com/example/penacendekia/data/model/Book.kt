@@ -17,6 +17,7 @@ data class Book(
     val size: String? = null,
     val synopsis: String? = null,
     val cover_url: String? = null,
+    val coverResId: Int? = null,
     val rating: Double = 4.9,
     val rating_count: Int = 120,
     val price: Double = 0.0,

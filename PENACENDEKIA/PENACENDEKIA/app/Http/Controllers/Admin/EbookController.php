@@ -71,7 +71,7 @@ class EbookController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'author' => ['required', 'string', 'max:255'],
+            'author' => ['required', 'string', 'max:500'],
             'editor' => ['nullable', 'string', 'max:255'],
             'publisher' => ['nullable', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:100'],
@@ -119,9 +119,10 @@ class EbookController extends Controller
 
         $validated['publisher'] = $validated['publisher'] ?: 'PT. Pena Cendekia Pustaka';
         $validated['language'] = $validated['language'] ?: 'Indonesia';
-        $validated['is_free'] = $request->boolean('is_free', true);
+        $hasPrice = !empty($validated['price']) && (float)$validated['price'] > 0;
+        $validated['is_free'] = $request->has('is_free') ? ($request->boolean('is_free') && !$hasPrice) : !$hasPrice;
         $validated['price'] = $validated['is_free'] ? 0 : ($validated['price'] ?? 0);
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : true;
         $validated['order'] = $request->input('order', 0);
 
         unset($validated['ebook_file'], $validated['sample_file']);
@@ -154,7 +155,7 @@ class EbookController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'author' => ['required', 'string', 'max:255'],
+            'author' => ['required', 'string', 'max:500'],
             'editor' => ['nullable', 'string', 'max:255'],
             'publisher' => ['nullable', 'string', 'max:255'],
             'category' => ['nullable', 'string', 'max:100'],
@@ -212,9 +213,10 @@ class EbookController extends Controller
 
         $validated['publisher'] = $validated['publisher'] ?: 'PT. Pena Cendekia Pustaka';
         $validated['language'] = $validated['language'] ?: 'Indonesia';
-        $validated['is_free'] = $request->boolean('is_free', true);
+        $hasPrice = !empty($validated['price']) && (float)$validated['price'] > 0;
+        $validated['is_free'] = $request->has('is_free') ? ($request->boolean('is_free') && !$hasPrice) : !$hasPrice;
         $validated['price'] = $validated['is_free'] ? 0 : ($validated['price'] ?? 0);
-        $validated['is_active'] = $request->boolean('is_active', true);
+        $validated['is_active'] = $request->has('is_active') ? $request->boolean('is_active') : true;
         $validated['order'] = $request->input('order', 0);
 
         unset($validated['ebook_file'], $validated['sample_file']);

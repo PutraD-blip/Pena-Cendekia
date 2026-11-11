@@ -31,12 +31,32 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        private var hasPlayedEntrance = false
     }
+
+    private var renderedLatestBookIds: List<Int> = emptyList()
+    private var renderedPopularBookIds: List<Int> = emptyList()
+    private var renderedEbookIds: List<Int> = emptyList()
+    private var lastLoadTime: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        // Clear stale Glide disk and memory caches on startup so re-indexed drawables are fresh
+        try {
+            com.bumptech.glide.Glide.get(this).clearMemory()
+            Thread {
+                try {
+                    com.bumptech.glide.Glide.get(applicationContext).clearDiskCache()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -116,11 +136,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Fallback default click listeners immediately so UI is responsive offline
-        setupFallbackClickListeners()
+        // Prioritaskan cache persisten (RAM -> Disk) agar 0 detik tanpa jeda dan tanpa layout shift!
+        val cached = BookCatalogRepository.getOrLoadHomeData(this)
+        if (cached != null) {
+            bindHomeData(cached)
+        } else {
+            // Fallback default click listeners hanya jika cache sama sekali belum ada (instalasi awal)
+            setupFallbackClickListeners()
+        }
 
-        // Smooth entrance animations for home elements
-        playSmoothEntranceAnimations()
+        // Smooth entrance animations only on cold start, not on every tab switch!
+        if (!hasPlayedEntrance) {
+            playSmoothEntranceAnimations()
+            hasPlayedEntrance = true
+        }
 
         // Load live curated data from Pena Cendekia backend (E-Books & Books)
         loadHomeData()
@@ -167,12 +196,22 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         findViewById<BottomNavigationView>(R.id.bottomNavigation)?.menu?.findItem(R.id.nav_beranda)?.isChecked = true
         val userName = UserSessionManager.getUserName(this)
-        findViewById<TextView>(R.id.tvGreeting)?.text = "Halo, $userName! Mari membuka wawasan."
-        // Refresh home data when resuming to reflect any changes from website admin
-        loadHomeData()
+        val firstName = userName.trim().split(Regex("\\s+")).firstOrNull()?.takeIf { it.isNotBlank() } ?: "Pembaca"
+        findViewById<TextView>(R.id.tvGreeting)?.text = "Halo, $firstName! Mari membuka wawasan."
+
+        // Segera terapkan cache data jika ada agar 0 detik tanpa jeda tampilan
+        BookCatalogRepository.getOrLoadHomeData(this)?.let { cached ->
+            bindHomeData(cached)
+        }
+
+        // Refresh data dari server di background (hindari duplikasi jika baru saja dipanggil saat onCreate)
+        if (System.currentTimeMillis() - lastLoadTime > 2500L) {
+            loadHomeData()
+        }
     }
 
     private fun loadHomeData() {
+        lastLoadTime = System.currentTimeMillis()
         RetrofitClient.apiService.getHome().enqueue(object : Callback<ApiResponse<HomeData>> {
             override fun onResponse(
                 call: Call<ApiResponse<HomeData>>,
@@ -182,6 +221,7 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val homeData = response.body()?.data ?: return
                     Log.i(TAG, "Home data loaded successfully: total_books=${homeData.total_books}, ebooks=${homeData.ebooks?.size}")
+                    BookCatalogRepository.setHomeData(this@MainActivity, homeData)
                     bindHomeData(homeData)
                 } else {
                     Log.w(TAG, "Home API error response: ${response.code()} ${response.message()}")
@@ -198,20 +238,20 @@ class MainActivity : AppCompatActivity() {
     private fun bindHomeData(homeData: HomeData) {
         // 1. Dynamic greeting customized with logged-in user's name
         val userName = UserSessionManager.getUserName(this)
+        val firstName = userName.trim().split(Regex("\\s+")).firstOrNull()?.takeIf { it.isNotBlank() } ?: "Pembaca"
         val serverGreeting = homeData.greeting
         val formattedGreeting = if (!serverGreeting.isNullOrBlank()) {
-            if (userName != UserSessionManager.DEFAULT_NAME && serverGreeting.contains("Alya")) {
-                val firstName = userName.trim().split(Regex("\\s+")).firstOrNull() ?: userName
-                serverGreeting.replace("Alya", firstName)
+            if (serverGreeting.contains("Alya", ignoreCase = true)) {
+                serverGreeting.replace(Regex("Alya(\\s+Putri)?", RegexOption.IGNORE_CASE), firstName)
             } else {
                 serverGreeting
             }
         } else {
-            "Halo, $userName! Mari membuka wawasan."
+            "Halo, $firstName! Mari membuka wawasan."
         }
         findViewById<TextView>(R.id.tvGreeting)?.text = formattedGreeting
 
-        // 2. Render live E-Books added from website admin or fallback to 11 e-books
+        // 2. Render live E-Books (cukup 3 saja di beranda, tombol Lihat Semua menuju Katalog)
         val liveEbooks = homeData.ebooks.orEmpty()
         val displayEbooks = if (liveEbooks.isNotEmpty()) {
             val serverTitles = liveEbooks.map { BookCatalogRepository.normalizeTitle(it.title) }.toSet()
@@ -222,67 +262,37 @@ class MainActivity : AppCompatActivity() {
         } else {
             BookCatalogRepository.ALL_11_BOOKS
         }
-        renderEbooks(displayEbooks)
+        val totalEbookCount = displayEbooks.size
+        findViewById<TextView>(R.id.tvEbookBadgeCount)?.text = "$totalEbookCount E-Book"
+        renderEbooks(displayEbooks.take(3))
 
-        // 3. Render latest book / ebook
-        homeData.latest_book?.let { latest ->
-            findViewById<TextView>(R.id.tvBookTitleLatest)?.text = latest.title
-            val authorCategory = listOfNotNull(
-                latest.author.takeIf { it.isNotBlank() },
-                latest.category?.takeIf { it.isNotBlank() }
-            ).joinToString(" · ")
-            findViewById<TextView>(R.id.tvBookAuthorLatest)?.text = authorCategory
-            findViewById<View>(R.id.layoutBookLatest)?.setOnClickListener {
-                openBookDetail(latest)
-            }
-            val ivLatest = findViewById<ImageView>(R.id.ivBookCoverLatest)
-            if (ivLatest != null) {
-                val formattedUrl = RetrofitClient.getFormattedImageUrl(latest.cover_url)
-                val localCover = BookCoverResolver.localCover(latest)
-                val fallbackCover = BookCoverResolver.placeholder(latest)
-                try {
-                    Glide.with(this)
-                        .load(formattedUrl ?: localCover ?: fallbackCover)
-                        .placeholder(fallbackCover)
-                        .error(fallbackCover)
-                        .into(ivLatest)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
+        // 3. Render 3 Buku Terbaru (maksimal 3 buku, format kartu mirip katalog)
+        val rawLatestBooks = if (!homeData.latest_books.isNullOrEmpty()) {
+            homeData.latest_books
+        } else if (homeData.latest_book != null) {
+            listOf(homeData.latest_book)
+        } else if (!homeData.ebooks.isNullOrEmpty()) {
+            homeData.ebooks.take(3)
+        } else {
+            designedHomeBooks().take(3)
         }
-
-        // 4. Render editor pick
-        homeData.editor_pick?.let { editorPick ->
-            findViewById<TextView>(R.id.tvBookTitleEditor)?.text = editorPick.title
-            findViewById<View>(R.id.layoutBookEditor)?.setOnClickListener {
-                openBookDetail(editorPick)
-            }
-            val ivEditor = findViewById<ImageView>(R.id.ivBookCoverEditor)
-            if (ivEditor != null) {
-                val formattedUrl = RetrofitClient.getFormattedImageUrl(editorPick.cover_url)
-                val localCover = BookCoverResolver.localCover(editorPick)
-                val fallbackCover = BookCoverResolver.placeholder(editorPick)
-                try {
-                    Glide.with(this)
-                        .load(formattedUrl ?: localCover ?: fallbackCover)
-                        .placeholder(fallbackCover)
-                        .error(fallbackCover)
-                        .into(ivEditor)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
+        val allLatestBooks = rawLatestBooks.map { BookCatalogRepository.enrichBook(it) }
+        renderLatestBooks(allLatestBooks)
 
         // 5. Render live popular books into Buku Terbitan horizontal container
-        val popular = homeData.popular_books.orEmpty()
+        val popular = homeData.popular_books.orEmpty().map { BookCatalogRepository.enrichBook(it) }
         renderPopularBooks(popular)
     }
 
     private fun renderPopularBooks(books: List<Book>) {
         val container = findViewById<LinearLayout>(R.id.layoutBukuTerbitanContainer) ?: return
         if (books.isEmpty()) return
+
+        val newIds = books.map { it.id }
+        if (newIds == renderedPopularBookIds && container.childCount == books.size) {
+            return
+        }
+        renderedPopularBookIds = newIds
 
         container.removeAllViews()
         books.forEach { book ->
@@ -309,14 +319,7 @@ class MainActivity : AppCompatActivity() {
                 scaleType = ImageView.ScaleType.CENTER_CROP
                 contentDescription = "Cover ${book.title}"
             }
-            val formattedUrl = RetrofitClient.getFormattedImageUrl(book.cover_url)
-            val localCover = BookCoverResolver.localCover(book)
-            val fallbackCover = BookCoverResolver.placeholder(book)
-            Glide.with(this)
-                .load(formattedUrl ?: localCover ?: fallbackCover)
-                .placeholder(fallbackCover)
-                .error(fallbackCover)
-                .into(ivCover)
+            BookCoverResolver.loadCover(ivCover, book)
             card.addView(ivCover)
             itemView.addView(card)
 
@@ -363,7 +366,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun renderEbooks(ebooks: List<Book>) {
         val container = findViewById<LinearLayout>(R.id.layoutEbooksContainer) ?: return
-        container.removeAllViews()
 
         if (ebooks.isEmpty()) {
             findViewById<View>(R.id.layoutEbooksSectionHeader)?.visibility = View.GONE
@@ -374,6 +376,14 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.layoutEbooksSectionHeader)?.visibility = View.VISIBLE
         findViewById<View>(R.id.scrollEbooks)?.visibility = View.VISIBLE
         findViewById<TextView>(R.id.tvEbookBadgeCount)?.text = "${ebooks.size} E-Book"
+
+        val newIds = ebooks.map { it.id }
+        if (newIds == renderedEbookIds && container.childCount == ebooks.size) {
+            return
+        }
+        renderedEbookIds = newIds
+
+        container.removeAllViews()
 
         ebooks.forEach { ebook ->
             val itemView = LinearLayout(this).apply {
@@ -406,14 +416,7 @@ class MainActivity : AppCompatActivity() {
                 contentDescription = "Cover ${ebook.title}"
             }
 
-            val formattedUrl = RetrofitClient.getFormattedImageUrl(ebook.cover_url)
-            val localCover = BookCoverResolver.localCover(ebook)
-            val placeholder = BookCoverResolver.placeholder(ebook)
-            Glide.with(this)
-                .load(formattedUrl ?: localCover ?: placeholder)
-                .placeholder(placeholder)
-                .error(placeholder)
-                .into(ivCover)
+            BookCoverResolver.loadCover(ivCover, ebook)
 
             frame.addView(ivCover)
 
@@ -486,35 +489,147 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupFallbackClickListeners() {
         val userName = UserSessionManager.getUserName(this)
-        findViewById<TextView>(R.id.tvGreeting)?.text = "Halo, $userName! Mari membuka wawasan."
+        val firstName = userName.trim().split(Regex("\\s+")).firstOrNull()?.takeIf { it.isNotBlank() } ?: "Pembaca"
+        findViewById<TextView>(R.id.tvGreeting)?.text = "Halo, $firstName! Mari membuka wawasan."
 
         val designedBooks = designedHomeBooks()
-        findViewById<TextView>(R.id.tvBookTitle1)?.text = designedBooks[0].title
-        findViewById<TextView>(R.id.tvBookAuthor1)?.text = designedBooks[0].author
-        findViewById<TextView>(R.id.tvBookTitle2)?.text = designedBooks[1].title
-        findViewById<TextView>(R.id.tvBookAuthor2)?.text = designedBooks[1].author
-        findViewById<TextView>(R.id.tvBookTitle3)?.text = designedBooks[2].title
-        findViewById<TextView>(R.id.tvBookAuthor3)?.text = designedBooks[2].author
-        findViewById<TextView>(R.id.tvBookTitleLatest)?.text = designedBooks[3].title
-        findViewById<TextView>(R.id.tvBookAuthorLatest)?.text =
-            "${designedBooks[3].author} · ${designedBooks[3].category}"
-        findViewById<TextView>(R.id.tvBookTitleEditor)?.text = designedBooks[4].title
 
-        val homeBookCards = listOf(
-            R.id.layoutBookItem1,
-            R.id.layoutBookItem2,
-            R.id.layoutBookItem3,
-            R.id.layoutBookLatest,
-            R.id.layoutBookEditor
-        )
-        homeBookCards.forEachIndexed { index, viewId ->
-            findViewById<View>(viewId)?.setOnClickListener {
-                openBookDetail(designedBooks[index])
-            }
-        }
+        // Render Buku Terbitan secara dinamis dan instan
+        renderPopularBooks(designedBooks.take(4))
+
+        // Tampilkan 3 buku terbaru default dengan format kartu katalog
+        renderLatestBooks(designedBooks.take(3))
 
         // Tampilkan juga seluruh e-book pada horizontal carousel e-book di Home
         renderEbooks(designedBooks)
+    }
+
+    private fun renderLatestBooks(books: List<Book>) {
+        val container = findViewById<LinearLayout>(R.id.layoutBukuTerbaruContainer) ?: return
+        if (books.isEmpty()) return
+
+        // Maksimal 3 buku terbaru:
+        // Jika admin mengunggah buku lebih dari 3 (misal upload buku ke-4),
+        // buku ke-3 bergeser ke posisi ke-2 dan buku ke-4 tampil di posisi ke-3
+        val displayBooks = if (books.size > 3) books.takeLast(3) else books
+
+        val newIds = displayBooks.map { it.id }
+        if (newIds == renderedLatestBookIds && container.childCount > 0) {
+            return
+        }
+        renderedLatestBookIds = newIds
+
+        container.removeAllViews()
+
+        for (i in 0 until 3) {
+            if (i < displayBooks.size) {
+                val bookCard = createHomeBookCard(displayBooks[i], hasRightMargin = (i < 2))
+                container.addView(bookCard)
+            } else {
+                val spacer = View(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(0, 0, 1f).apply {
+                        if (i < 2) marginEnd = dp(9)
+                    }
+                    visibility = View.INVISIBLE
+                }
+                container.addView(spacer)
+            }
+        }
+    }
+
+    private fun createHomeBookCard(book: Book, hasRightMargin: Boolean): View {
+        val col = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply {
+                if (hasRightMargin) marginEnd = dp(9)
+            }
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { openBookDetail(book) }
+        }
+
+        // Kartu sampul buku (128dp persis seperti di halaman katalog)
+        val card = MaterialCardView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(128))
+            radius = dp(7).toFloat()
+            cardElevation = dp(2).toFloat()
+            strokeWidth = 0
+            setCardBackgroundColor(getColor(R.color.card_cream))
+        }
+
+        val frame = FrameLayout(this).apply {
+            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+        }
+
+        val ivCover = ImageView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            contentDescription = book.title
+        }
+
+        BookCoverResolver.loadCover(ivCover, book)
+        frame.addView(ivCover)
+
+        // Overlay Badge "E-BOOK" di pojok kiri atas
+        val badge = TextView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT).apply {
+                leftMargin = dp(5)
+                topMargin = dp(5)
+            }
+            background = getDrawable(R.drawable.bg_chip_selected)
+            setPadding(dp(5), dp(2), dp(5), dp(2))
+            text = "E-BOOK"
+            setTextColor(getColor(R.color.white))
+            textSize = 8.5f
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+        }
+        frame.addView(badge)
+
+        card.addView(frame)
+        col.addView(card)
+
+        // Judul Buku (Maksimal 2 baris agar seragam dengan halaman katalog)
+        val tvTitle = TextView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                topMargin = dp(5)
+            }
+            text = book.title
+            setTextColor(getColor(R.color.primary_green))
+            textSize = 11f
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+            maxLines = 2
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        }
+        col.addView(tvTitle)
+
+        // Penulis Buku
+        val tvAuthor = TextView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                topMargin = dp(1)
+            }
+            text = book.author
+            setTextColor(getColor(R.color.text_muted))
+            textSize = 9.5f
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        }
+        col.addView(tvAuthor)
+
+        // Rating & Kategori
+        val specificCategory = book.category?.replace("E-Book · ", "")?.replace("E-Book / ", "") ?: "E-Book"
+        val tvRating = TextView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                topMargin = dp(2)
+            }
+            text = "★ ${book.rating} · $specificCategory"
+            setTextColor(android.graphics.Color.parseColor("#B87B2B"))
+            textSize = 9f
+            maxLines = 1
+            ellipsize = android.text.TextUtils.TruncateAt.END
+        }
+        col.addView(tvRating)
+
+        return col
     }
 
     private fun designedHomeBooks(): List<Book> = BookCatalogRepository.ALL_11_BOOKS

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="20dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="8dp"
+    app:strokeColor="#E6E9E0"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="26dp">
+
+        <!-- Top Badge: Red Circle with Logout Icon -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:cardBackgroundColor="#FEECEC"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#FBD5D5"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:contentDescription="Ikon Keluar"
+                android:src="@drawable/ic_logout"
+                app:tint="#D32F2F" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/lora"
+            android:text="Keluar dari Akun?"
+            android:textColor="#1C2A22"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- Message -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp"
+            android:fontFamily="@font/inter"
+            android:gravity="center"
+            android:lineSpacingExtra="3dp"
+            android:text="Apakah Anda yakin ingin keluar dari akun Pena Cendekia? Anda perlu masuk kembali untuk mengakses sesi bacaan Anda."
+            android:textColor="@color/text_muted"
+            android:textSize="13sp" />
+
+        <!-- Button 1: Keluar (Action Konfirmasi - Danger Red) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirmLogout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:backgroundTint="#D32F2F"
+            android:fontFamily="@font/inter"
+            android:text="Keluar"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:icon="@drawable/ic_logout"
+            app:iconGravity="textStart"
+            app:iconPadding="8dp"
+            app:iconTint="@color/white" />
+
+        <!-- Button 2: Batal (Aksi Batal - Neutral Light Green) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelLogout"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="#F2F5F3"
+            android:fontFamily="@font/inter"
+            android:text="Batal"
+            android:textAllCaps="false"
+            android:textColor="@color/primary_green"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:strokeColor="#D0DDD4"
+            app:strokeWidth="1dp" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

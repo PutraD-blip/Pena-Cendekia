@@ -114,10 +114,8 @@ class ReviewActivity : AppCompatActivity() {
                 reviewBook.category?.takeIf { it.isNotBlank() }
             ).joinToString(" · ")
 
-        val fallback = BookCoverResolver.localCover(reviewBook) ?: R.drawable.img_kepemimpinan_cover
-        val coverUrl = RetrofitClient.getFormattedImageUrl(reviewBook.cover_url)
         findViewById<ImageView>(R.id.ivReviewBookCover)?.let { image ->
-            Glide.with(this).load(coverUrl ?: fallback).placeholder(fallback).error(fallback).into(image)
+            BookCoverResolver.loadCover(image, reviewBook)
         }
     }
 

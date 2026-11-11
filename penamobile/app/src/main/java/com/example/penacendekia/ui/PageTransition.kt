@@ -42,7 +42,7 @@ object PageTransition {
     }
 
     /**
-     * Seamless bottom navigation tab switching without jarring flashes.
+     * Seamless bottom navigation tab switching without jarring flashes or activity destruction.
      */
     fun switchTab(activity: Activity, targetClass: Class<out Activity>) {
         if (activity.javaClass == targetClass) return
@@ -51,8 +51,7 @@ object PageTransition {
         }
         activity.startActivity(intent)
         @Suppress("DEPRECATION")
-        activity.overridePendingTransition(R.anim.fade_in_smooth, R.anim.fade_out_smooth)
-        activity.finish()
+        activity.overridePendingTransition(0, 0)
     }
 
     /**

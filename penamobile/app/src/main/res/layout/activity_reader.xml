@@ -245,7 +245,59 @@
 
     </LinearLayout>
 
-    <!-- Reading Content Scroll View -->
+    <!-- PDF Document Recycler View (Native High-Res Page Renderer) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPdfPages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/layoutReaderBottomControls"
+        android:layout_below="@id/toolbarReader"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingBottom="24dp"
+        android:visibility="gone" />
+
+    <!-- Loading State for PDF Download / Initialization -->
+    <LinearLayout
+        android:id="@+id/layoutPdfLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/pbPdfLoading"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:indeterminateTint="@color/primary_green" />
+
+        <TextView
+            android:id="@+id/tvPdfLoadingTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/inter"
+            android:text="Memuat Naskah E-Book Asli..."
+            android:textColor="@color/primary_green"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvPdfLoadingSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/inter"
+            android:text="Menyiapkan halaman dokumen..."
+            android:textColor="@color/text_muted"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <!-- Reading Content Scroll View (Fallback text mode) -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollViewReader"
         android:layout_width="match_parent"
@@ -264,79 +316,6 @@
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
             android:paddingTop="8dp">
-
-            <!-- Admin File Info Card (Integrated with Uploaded Document) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardFileInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="#E8F2EC"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/divider_color"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:layout_marginEnd="6dp"
-                            android:contentDescription="Dokumen"
-                            android:src="@drawable/ic_book_open"
-                            app:tint="@color/primary_green" />
-
-                        <TextView
-                            android:id="@+id/tvFileInfoBadge"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/inter"
-                            android:text="E-Book Resmi Terbitan Web Pena Cendekia"
-                            android:textColor="@color/primary_green"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/tvFileInfoDetail"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:fontFamily="@font/inter"
-                        android:text="Format PDF / E-Pub • Terverifikasi Admin"
-                        android:textColor="@color/text_muted"
-                        android:textSize="11.5sp" />
-
-                    <TextView
-                        android:id="@+id/btnOpenOriginalDoc"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:fontFamily="@font/inter"
-                        android:paddingVertical="2dp"
-                        android:text="📄 Buka / Unduh Berkas E-Book Asli ➔"
-                        android:textColor="@color/primary_green"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:visibility="gone" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
 
             <!-- Chapter Subtitle: BAB 1 -->
             <TextView

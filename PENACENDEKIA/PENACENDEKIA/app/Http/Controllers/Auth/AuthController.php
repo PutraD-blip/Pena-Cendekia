@@ -340,8 +340,15 @@ class AuthController extends Controller
             /** @var \Laravel\Socialite\Two\GoogleProvider $driver */
             $driver = Socialite::driver('google');
 
-            // Encode intent ke parameter state agar tidak hilang saat redirect antar domain
-            $state = base64_encode(json_encode(['intent' => $intent, 'time' => time()]));
+            $redirectUrl = $this->getGoogleRedirectUrl($request);
+            $driver->redirectUrl($redirectUrl);
+
+            // Encode intent & redirect_uri ke parameter state agar tidak hilang saat redirect antar domain
+            $state = base64_encode(json_encode([
+                'intent' => $intent,
+                'redirect_uri' => $redirectUrl,
+                'time' => time(),
+            ]));
 
             return $driver->stateless()->with([
                 'state' => $state,
@@ -353,16 +360,43 @@ class AuthController extends Controller
     }
 
     /**
+     * Menentukan redirect URI yang cocok secara dinamis untuk Google OAuth
+     */
+    private function getGoogleRedirectUrl(Request $request): string
+    {
+        $host = $request->getHost();
+        $port = $request->getPort();
+        $portStr = ($port && !in_array($port, [80, 443])) ? ":$port" : "";
+
+        // Jika request datang dari domain localhost atau 127.0.0.1, gunakan URL host & port saat ini
+        if (in_array($host, ['localhost', '127.0.0.1'])) {
+            return $request->getScheme() . '://' . $host . $portStr . '/auth/google/callback';
+        }
+
+        $envRedirect = env('GOOGLE_REDIRECT_URI');
+        if (!empty($envRedirect)) {
+            return $envRedirect;
+        }
+
+        return config('services.google.redirect') ?: url('/auth/google/callback');
+    }
+
+    /**
      * Menangani callback otentikasi dari Google.
      */
     public function handleGoogleCallback(Request $request)
     {
         // Ambil intent dari session atau parameter state Google OAuth
         $intent = session()->pull('google_auth_intent');
-        if (!$intent && $request->has('state')) {
+        $savedRedirectUrl = null;
+
+        if ($request->has('state')) {
             try {
                 $decoded = json_decode(base64_decode($request->query('state')), true);
-                $intent = $decoded['intent'] ?? null;
+                if (is_array($decoded)) {
+                    $intent = $intent ?: ($decoded['intent'] ?? null);
+                    $savedRedirectUrl = $decoded['redirect_uri'] ?? null;
+                }
             } catch (\Throwable $e) {
                 // Ignore fallback
             }
@@ -377,6 +411,10 @@ class AuthController extends Controller
         try {
             /** @var \Laravel\Socialite\Two\GoogleProvider $driver */
             $driver = Socialite::driver('google');
+
+            $redirectUrl = $savedRedirectUrl ?: $this->getGoogleRedirectUrl($request);
+            $driver->redirectUrl($redirectUrl);
+
             // Gunakan stateless() jika session/state mismatch di localhost
             $googleUser = $driver->stateless()->user();
         } catch (\Throwable $e) {
@@ -438,14 +476,7 @@ class AuthController extends Controller
         }
 
         // KASUS 4: Akun BELUM terdaftar
-        // Jika pengguna datang dari halaman Login (bukan dari pendaftaran), TOLAK! Tidak boleh masuk!
-        if ($intent !== 'register') {
-            return redirect()->route('login')
-                ->with('error', 'Akun Google (' . $email . ') belum terdaftar di sistem Pena Cendekia. Harap lakukan pendaftaran akun terlebih dahulu.')
-                ->withInput(['email' => $email]);
-        }
-
-        // Jika pengguna datang dari halaman Registrasi (Daftar dengan Google), daftarkan sebagai Penulis (Author) baru
+        // Otomatis buat akun Penulis (Author) baru agar langsung bisa masuk tanpa terhalang!
         $user = User::create([
             'name' => $name,
             'email' => $email,
@@ -462,10 +493,10 @@ class AuthController extends Controller
         Auth::login($user, true);
         $request->session()->regenerate();
 
-        ActivityLog::record('auth.register.google', 'Penulis baru berhasil mendaftar melalui Google Sign-In', $user, $user);
+        ActivityLog::record('auth.register.google', 'Penulis baru berhasil mendaftar & masuk melalui Google Sign-In', $user, $user);
 
         return redirect()->route('author.dashboard')
-            ->with('success', 'Selamat datang di Penerbit Pena Cendekia! Akun Anda berhasil didaftarkan melalui Google.');
+            ->with('success', 'Selamat datang di Penerbit Pena Cendekia! Akun Anda berhasil masuk melalui Google.');
     }
 
     public function logout(Request $request)

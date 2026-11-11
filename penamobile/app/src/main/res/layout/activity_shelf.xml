@@ -108,7 +108,7 @@
                     android:fontFamily="@font/inter"
                     android:paddingHorizontal="16dp"
                     android:paddingVertical="9dp"
-                    android:text="Sesi Aktif · 2"
+                    android:text="Sesi Aktif · 0"
                     android:textColor="@color/white"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -129,12 +129,86 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
+            <!-- Empty State when no active reading sessions -->
+            <LinearLayout
+                android:id="@+id/layoutShelfEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="48dp"
+                android:visibility="gone">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="88dp"
+                    android:layout_height="88dp"
+                    app:cardBackgroundColor="#EAF2ED"
+                    app:cardCornerRadius="44dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <ImageView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="Rak Kosong"
+                        android:src="@drawable/ic_book_open"
+                        app:tint="@color/primary_green" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:fontFamily="@font/lora"
+                    android:text="Belum Ada Buku di Rak"
+                    android:textColor="@color/primary_green"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter"
+                    android:gravity="center"
+                    android:text="Akun Anda belum memiliki sesi bacaan aktif. Jelajahi katalog buku untuk memilih e-book dan mulai membaca."
+                    android:textColor="@color/text_muted"
+                    android:textSize="13sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExploreFromShelf"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="22dp"
+                    android:backgroundTint="@color/primary_green"
+                    android:fontFamily="@font/inter"
+                    android:paddingHorizontal="24dp"
+                    android:text="Jelajahi Katalog E-Book"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="13.5sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="10dp" />
+
+            </LinearLayout>
+
+            <!-- Container for Dynamic Active Reading Sessions -->
+            <LinearLayout
+                android:id="@+id/layoutActiveSessionsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
             <!-- Book 1 Card: Kepemimpinan Visioner -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardShelfBook1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="18dp"
+                android:visibility="gone"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
@@ -167,7 +241,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Digitalisasi Pendidikan Islam"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/img_digitalisasi_cover" />
+                                android:src="@drawable/img_digitalisasi_pendidikan_islam_cover" />
 
                         </com.google.android.material.card.MaterialCardView>
 
@@ -308,6 +382,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
+                android:visibility="gone"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
@@ -340,7 +415,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Administrasi Rekam Medis"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/img_administrasi_cover" />
+                                android:src="@drawable/img_administrasi_rekam_medis" />
 
                         </com.google.android.material.card.MaterialCardView>
 

@@ -109,7 +109,7 @@
                             android:layout_height="match_parent"
                             android:contentDescription="Cover Buku"
                             android:scaleType="centerCrop"
-                            tools:src="@drawable/img_kepemimpinan_cover" />
+                            tools:src="@drawable/img_kepemimpinan_visioner_cover" />
 
                     </com.google.android.material.card.MaterialCardView>
 

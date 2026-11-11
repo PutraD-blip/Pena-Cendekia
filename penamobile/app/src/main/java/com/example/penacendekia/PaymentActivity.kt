@@ -123,12 +123,7 @@ class PaymentActivity : AppCompatActivity() {
 
         val coverImageView = findViewById<ImageView>(R.id.ivPaymentBookCover)
         if (coverImageView != null) {
-            val fallback = BookCoverResolver.localCover(book) ?: R.drawable.img_kepemimpinan_cover
-            Glide.with(this)
-                .load(book.cover_url ?: fallback)
-                .placeholder(fallback)
-                .error(fallback)
-                .into(coverImageView)
+            BookCoverResolver.loadCover(coverImageView, book)
         }
 
         val priceText = book.formatted_price ?: when {

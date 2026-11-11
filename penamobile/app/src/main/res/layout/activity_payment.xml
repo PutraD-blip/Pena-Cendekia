@@ -166,7 +166,7 @@
                                 android:layout_height="match_parent"
                                 android:contentDescription="Sampul Buku"
                                 android:scaleType="centerCrop"
-                                android:src="@drawable/img_kepemimpinan_cover" />
+                                android:src="@drawable/img_kepemimpinan_visioner_cover" />
 
                         </com.google.android.material.card.MaterialCardView>
 

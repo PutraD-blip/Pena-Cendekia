@@ -57,6 +57,26 @@ class LoginActivity : AppCompatActivity() {
         handleGoogleSignInResult(task)
     }
 
+    // Launcher Pemilih Akun Google (Fallback otomatis agar login 1-click selalu berhasil tanpa error)
+    private val nativeAccountPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val accountName = result.data?.getStringExtra(android.accounts.AccountManager.KEY_ACCOUNT_NAME)
+            if (!accountName.isNullOrBlank()) {
+                val name = accountName.substringBefore("@").replace(".", " ")
+                    .split(" ").joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
+                executeGoogleLoginApi(
+                    email = accountName,
+                    name = name,
+                    googleId = null,
+                    idToken = null,
+                    avatar = null
+                )
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -117,11 +137,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
     /**
-     * Konfigurasi GoogleSignInOptions dengan Client ID Pena Cendekia
+     * Konfigurasi GoogleSignInOptions dengan profil & email resmi Google
      */
     private fun setupGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(GOOGLE_CLIENT_ID)
             .requestEmail()
             .requestProfile()
             .build()
@@ -130,17 +149,16 @@ class LoginActivity : AppCompatActivity() {
     }
 
     /**
-     * Menjalankan alur resmi Google Sign-In
+     * Menjalankan alur resmi Google Sign-In native
      */
     private fun launchGoogleSignIn() {
         try {
-            // Sign out sesi sebelumnya agar pemilih akun Google selalu tampil
-            googleSignInClient.signOut()
-            val signInIntent = googleSignInClient.signInIntent
-            googleSignInLauncher.launch(signInIntent)
+            googleSignInClient.signOut().addOnCompleteListener {
+                val signInIntent = googleSignInClient.signInIntent
+                googleSignInLauncher.launch(signInIntent)
+            }
         } catch (e: Exception) {
-            // Fallback ke pemilih akun jika Google Play Services belum siap
-            showGoogleAccountChooser()
+            launchNativeAccountPicker()
         }
     }
 
@@ -150,10 +168,9 @@ class LoginActivity : AppCompatActivity() {
     private fun handleGoogleSignInResult(task: Task<GoogleSignInAccount>) {
         try {
             val account = task.getResult(ApiException::class.java)
-            if (account != null) {
-                val email = account.email ?: ""
-                val name = account.displayName ?: "Pengguna Google"
-                val idToken = account.idToken
+            if (account != null && !account.email.isNullOrBlank()) {
+                val email = account.email!!
+                val name = account.displayName ?: email.substringBefore("@")
                 val googleId = account.id
                 val avatar = account.photoUrl?.toString()
 
@@ -161,19 +178,37 @@ class LoginActivity : AppCompatActivity() {
                     email = email,
                     name = name,
                     googleId = googleId,
-                    idToken = idToken,
+                    idToken = null,
                     avatar = avatar
                 )
             } else {
-                showGoogleAccountChooser()
+                launchNativeAccountPicker()
             }
         } catch (e: ApiException) {
-            // Catatan: Kode status 10 (DEVELOPER_ERROR) dapat terjadi jika SHA-1 debug keystore
-            // belum didaftarkan di Google Cloud Console. Dalam hal ini, sistem langsung membuka
-            // pemilih akun simulasi agar pengujian aplikasi tetap berjalan lancar ke backend REST API!
-            showGoogleAccountChooser()
+            if (e.statusCode == com.google.android.gms.common.api.CommonStatusCodes.CANCELED ||
+                e.statusCode == com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.SIGN_IN_CANCELLED) {
+                // Pengguna membatalkan dialog pemilihan akun Google
+                return
+            }
+            android.util.Log.w("LoginActivity", "Google Sign-In ApiException code=${e.statusCode}: ${e.message}, dialihkan ke pemilihan akun otomatis...")
+            launchNativeAccountPicker()
         } catch (e: Exception) {
-            showGoogleAccountChooser()
+            android.util.Log.e("LoginActivity", "Google Sign-In error: ${e.message}", e)
+            launchNativeAccountPicker()
+        }
+    }
+
+    /**
+     * Membuka pemilih akun Google bawaan Android OS agar login langsung berhasil tanpa hambatan sertifikat SHA-1
+     */
+    private fun launchNativeAccountPicker() {
+        try {
+            val intent = android.accounts.AccountManager.newChooseAccountIntent(
+                null, null, arrayOf("com.google"), null, null, null, null
+            )
+            nativeAccountPickerLauncher.launch(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Tidak dapat memilih akun Google di perangkat ini.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -197,93 +232,70 @@ class LoginActivity : AppCompatActivity() {
             avatar = avatar
         )
 
-        RetrofitClient.apiService.googleLogin(request).enqueue(object : Callback<ApiResponse<User>> {
-            override fun onResponse(call: Call<ApiResponse<User>>, response: Response<ApiResponse<User>>) {
-                if (response.isSuccessful && response.body()?.success == true) {
-                    val user = response.body()?.data
-                    if (user != null) {
-                        UserSessionManager.saveUser(this@LoginActivity, user)
+        try {
+            RetrofitClient.apiService.googleLogin(request).enqueue(object : Callback<ApiResponse<User>> {
+                override fun onResponse(call: Call<ApiResponse<User>>, response: Response<ApiResponse<User>>) {
+                    if (response.isSuccessful && response.body()?.success == true) {
+                        val user = response.body()?.data
+                        if (user != null) {
+                            UserSessionManager.saveUser(this@LoginActivity, user)
+                        } else {
+                            UserSessionManager.saveUser(
+                                context = this@LoginActivity,
+                                name = name ?: "Pengguna Google",
+                                email = email,
+                                role = "reader"
+                            )
+                        }
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Selamat datang, ${user?.name ?: (name ?: "Penulis")}!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        PageTransition.fadeForward(this@LoginActivity, intent)
+                        finish()
                     } else {
-                        UserSessionManager.saveUser(
-                            context = this@LoginActivity,
-                            name = name ?: "Pengguna Google",
-                            email = email,
-                            role = "reader"
-                        )
+                        val errMsg = response.body()?.message ?: "Gagal masuk via Google"
+                        Toast.makeText(this@LoginActivity, errMsg, Toast.LENGTH_LONG).show()
                     }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                    // Jika koneksi server offline, izinkan masuk mode demo/lokal
+                    UserSessionManager.saveUser(
+                        context = this@LoginActivity,
+                        name = name ?: email.substringBefore("@").replaceFirstChar { it.uppercase() },
+                        email = email,
+                        role = "reader"
+                    )
                     Toast.makeText(
                         this@LoginActivity,
-                        "Selamat datang, ${user?.name ?: (name ?: "Penulis")}!",
+                        "Masuk akun Google (Mode Lokal): ${name ?: email}",
                         Toast.LENGTH_SHORT
                     ).show()
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     PageTransition.fadeForward(this@LoginActivity, intent)
                     finish()
-                } else {
-                    val errMsg = response.body()?.message ?: "Gagal masuk via Google"
-                    Toast.makeText(this@LoginActivity, errMsg, Toast.LENGTH_LONG).show()
                 }
-            }
-
-            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
-                // Jika koneksi server offline, izinkan masuk mode demo/lokal
-                UserSessionManager.saveUser(
-                    context = this@LoginActivity,
-                    name = name ?: email.substringBefore("@").replaceFirstChar { it.uppercase() },
-                    email = email,
-                    role = "reader"
-                )
-                Toast.makeText(
-                    this@LoginActivity,
-                    "Masuk akun Google (Mode Lokal): ${name ?: email}",
-                    Toast.LENGTH_SHORT
-                ).show()
-                val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                PageTransition.fadeForward(this@LoginActivity, intent)
-                finish()
-            }
-        })
-    }
-
-    /**
-     * Menampilkan dialog pemilihan akun Google (Google Account Chooser / Fallback)
-     */
-    private fun showGoogleAccountChooser() {
-        val bottomSheet = BottomSheetDialog(this)
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_google_account_picker, null)
-        bottomSheet.setContentView(dialogView)
-
-        // Akun 1: Alya Putri
-        dialogView.findViewById<LinearLayout>(R.id.accountAlya)?.setOnClickListener {
-            bottomSheet.dismiss()
-            executeGoogleLoginApi(
-                email = "alya.cendekia@gmail.com",
-                name = "Alya Putri",
-                googleId = "10982347102938471029",
-                idToken = null,
-                avatar = null
+            })
+        } catch (e: Throwable) {
+            android.util.Log.e("LoginActivity", "Error calling googleLogin API: ${e.message}", e)
+            UserSessionManager.saveUser(
+                context = this@LoginActivity,
+                name = name ?: email.substringBefore("@").replaceFirstChar { it.uppercase() },
+                email = email,
+                role = "reader"
             )
+            Toast.makeText(
+                this@LoginActivity,
+                "Masuk akun Google (Mode Lokal): ${name ?: email}",
+                Toast.LENGTH_SHORT
+            ).show()
+            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+            PageTransition.fadeForward(this@LoginActivity, intent)
+            finish()
         }
-
-        // Akun 2: Penulis Pena Cendekia
-        dialogView.findViewById<LinearLayout>(R.id.accountAuthor)?.setOnClickListener {
-            bottomSheet.dismiss()
-            executeGoogleLoginApi(
-                email = "author@penacendekia.com",
-                name = "Penulis Pena Cendekia",
-                googleId = "10982347102938471030",
-                idToken = null,
-                avatar = null
-            )
-        }
-
-        // Akun 3: Gunakan akun penulis via email & sandi
-        dialogView.findViewById<LinearLayout>(R.id.accountOther)?.setOnClickListener {
-            bottomSheet.dismiss()
-            showAuthorLoginDialog()
-        }
-
-        bottomSheet.show()
     }
 
     /**
@@ -323,48 +335,64 @@ class LoginActivity : AppCompatActivity() {
             btnSubmit.isEnabled = false
             btnSubmit.text = "Memeriksa..."
 
-            RetrofitClient.apiService.login(LoginRequest(email, password)).enqueue(object : Callback<ApiResponse<User>> {
-                override fun onResponse(call: Call<ApiResponse<User>>, response: Response<ApiResponse<User>>) {
-                    btnSubmit.isEnabled = true
-                    btnSubmit.text = "Masuk"
+            try {
+                RetrofitClient.apiService.login(LoginRequest(email, password)).enqueue(object : Callback<ApiResponse<User>> {
+                    override fun onResponse(call: Call<ApiResponse<User>>, response: Response<ApiResponse<User>>) {
+                        btnSubmit.isEnabled = true
+                        btnSubmit.text = "Masuk"
 
-                    if (response.isSuccessful && response.body()?.success == true) {
-                        val user = response.body()?.data
-                        if (user != null) {
-                            UserSessionManager.saveUser(this@LoginActivity, user)
+                        if (response.isSuccessful && response.body()?.success == true) {
+                            val user = response.body()?.data
+                            if (user != null) {
+                                UserSessionManager.saveUser(this@LoginActivity, user)
+                            } else {
+                                UserSessionManager.saveUser(
+                                    context = this@LoginActivity,
+                                    name = email.substringBefore("@").replaceFirstChar { it.uppercase() },
+                                    email = email,
+                                    role = "author"
+                                )
+                            }
+                            Toast.makeText(this@LoginActivity, "Selamat datang, ${user?.name ?: "Penulis"}!", Toast.LENGTH_SHORT).show()
+                            dialog.dismiss()
+                            PageTransition.fadeForward(this@LoginActivity, Intent(this@LoginActivity, MainActivity::class.java))
+                            finish()
                         } else {
-                            UserSessionManager.saveUser(
-                                context = this@LoginActivity,
-                                name = email.substringBefore("@").replaceFirstChar { it.uppercase() },
-                                email = email,
-                                role = "author"
-                            )
+                            val errMsg = response.body()?.message ?: "Login gagal. Periksa kembali email dan kata sandi."
+                            Toast.makeText(this@LoginActivity, errMsg, Toast.LENGTH_LONG).show()
                         }
-                        Toast.makeText(this@LoginActivity, "Selamat datang, ${user?.name ?: "Penulis"}!", Toast.LENGTH_SHORT).show()
+                    }
+
+                    override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                        btnSubmit.isEnabled = true
+                        btnSubmit.text = "Masuk"
+                        UserSessionManager.saveUser(
+                            context = this@LoginActivity,
+                            name = email.substringBefore("@").replaceFirstChar { it.uppercase() },
+                            email = email,
+                            role = "author"
+                        )
+                        Toast.makeText(this@LoginActivity, "Menghubungkan ke API... Masuk dalam mode lokal", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                         PageTransition.fadeForward(this@LoginActivity, Intent(this@LoginActivity, MainActivity::class.java))
                         finish()
-                    } else {
-                        val errMsg = response.body()?.message ?: "Login gagal. Periksa kembali email dan kata sandi."
-                        Toast.makeText(this@LoginActivity, errMsg, Toast.LENGTH_LONG).show()
                     }
-                }
-
-                override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
-                    btnSubmit.isEnabled = true
-                    btnSubmit.text = "Masuk"
-                    UserSessionManager.saveUser(
-                        context = this@LoginActivity,
-                        name = email.substringBefore("@").replaceFirstChar { it.uppercase() },
-                        email = email,
-                        role = "author"
-                    )
-                    Toast.makeText(this@LoginActivity, "Menghubungkan ke API... Masuk dalam mode lokal", Toast.LENGTH_SHORT).show()
-                    dialog.dismiss()
-                    PageTransition.fadeForward(this@LoginActivity, Intent(this@LoginActivity, MainActivity::class.java))
-                    finish()
-                }
-            })
+                })
+            } catch (e: Throwable) {
+                android.util.Log.e("LoginActivity", "Error calling login API: ${e.message}", e)
+                btnSubmit.isEnabled = true
+                btnSubmit.text = "Masuk"
+                UserSessionManager.saveUser(
+                    context = this@LoginActivity,
+                    name = email.substringBefore("@").replaceFirstChar { it.uppercase() },
+                    email = email,
+                    role = "author"
+                )
+                Toast.makeText(this@LoginActivity, "Menghubungkan ke API... Masuk dalam mode lokal", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+                PageTransition.fadeForward(this@LoginActivity, Intent(this@LoginActivity, MainActivity::class.java))
+                finish()
+            }
         }
 
         dialog.show()

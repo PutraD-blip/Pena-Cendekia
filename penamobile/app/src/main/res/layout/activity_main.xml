@@ -80,7 +80,7 @@
                 android:maxLines="1"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
-                tools:text="Selamat pagi, Alya. Mari membuka wawasan." />
+                tools:text="Selamat pagi. Mari membuka wawasan." />
 
         </LinearLayout>
 
@@ -117,7 +117,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
             android:paddingBottom="24dp">
@@ -362,204 +361,11 @@
                     android:id="@+id/layoutBukuTerbitanContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <!-- Book Item 1 -->
-                    <LinearLayout
-                        android:id="@+id/layoutBookItem1"
-                        android:layout_width="115dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="14dp"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="115dp"
-                            android:layout_height="165dp"
-                            app:cardBackgroundColor="@color/card_cream"
-                            app:cardCornerRadius="10dp"
-                            app:cardElevation="0dp"
-                            app:strokeWidth="0dp">
-
-                            <ImageView
-                                android:id="@+id/ivBookCover1"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="Cover Buku"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/img_kepemimpinan_cover" />
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <TextView
-                            android:id="@+id/tvBookTitle1"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:text="Kepemimpinan Vi..."
-                            android:textColor="@color/primary_green"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvBookAuthor1"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:text="Dr. Ahmad Zain Sarn..."
-                            android:textColor="@color/text_muted"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:text="★ 4,9 · Agama"
-                            android:textColor="@color/accent_gold"
-                            android:textSize="11sp" />
-
-                    </LinearLayout>
-
-                    <!-- Book Item 2 -->
-                    <LinearLayout
-                        android:id="@+id/layoutBookItem2"
-                        android:layout_width="115dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="14dp"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="115dp"
-                            android:layout_height="165dp"
-                            app:cardBackgroundColor="@color/card_cream"
-                            app:cardCornerRadius="10dp"
-                            app:cardElevation="0dp"
-                            app:strokeWidth="0dp">
-
-                            <ImageView
-                                android:id="@+id/ivBookCover2"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="Cover Buku"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/img_digitalisasi_cover" />
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <TextView
-                            android:id="@+id/tvBookTitle2"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:text="DIGITALISASI PE..."
-                            android:textColor="@color/primary_green"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvBookAuthor2"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:text="Dr. Hj. Siti Yumnah, M..."
-                            android:textColor="@color/text_muted"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:text="★ 4,8 · Agama · Studi Islam"
-                            android:textColor="@color/accent_gold"
-                            android:textSize="11sp" />
-
-                    </LinearLayout>
-
-                    <!-- Book Item 3 -->
-                    <LinearLayout
-                        android:id="@+id/layoutBookItem3"
-                        android:layout_width="115dp"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="115dp"
-                            android:layout_height="165dp"
-                            app:cardBackgroundColor="@color/card_cream"
-                            app:cardCornerRadius="10dp"
-                            app:cardElevation="0dp"
-                            app:strokeWidth="0dp">
-
-                            <ImageView
-                                android:id="@+id/ivBookCover3"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:contentDescription="Cover Buku"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/img_administrasi" />
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <TextView
-                            android:id="@+id/tvBookTitle3"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:text="ADMINISTRASI R..."
-                            android:textColor="@color/primary_green"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/tvBookAuthor3"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:text="Aries Wahyuningsih, I..."
-                            android:textColor="@color/text_muted"
-                            android:textSize="11sp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:text="★ 4,8 · Kesehatan"
-                            android:textColor="@color/accent_gold"
-                            android:textSize="11sp" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
+                    android:orientation="horizontal" />
 
             </com.example.penacendekia.ui.NestedHorizontalScrollView>
 
-            <!-- Section 2: Buku Terbaru Header Row -->
+            <!-- Section 2: Buku Terbaru Header Row (Jelajahi Dihapus Sesuai Permintaan) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -568,224 +374,23 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:fontFamily="@font/lora"
                     android:text="Buku terbaru"
                     android:textColor="@color/primary_green"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tvJelajahi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/inter"
-                    android:text="Jelajahi"
-                    android:textColor="@color/outline_green"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
             </LinearLayout>
 
-            <!-- Section 2: Buku Terbaru Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/layoutBookLatest"
+            <!-- Dynamic 3 Buku Terbaru Container (Format 3 Kolom Mirip Halaman Katalog) -->
+            <LinearLayout
+                android:id="@+id/layoutBukuTerbaruContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/divider_color"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="72dp"
-                        android:layout_height="100dp"
-                        app:cardBackgroundColor="#D5CEE0"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="0dp">
-
-                        <ImageView
-                            android:id="@+id/ivBookCoverLatest"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="Cover Buku Terbaru"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/img_accounting"
-                            tools:src="@drawable/img_accounting" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/tvBookTitleLatest"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:fontFamily="@font/inter"
-                                android:textColor="@color/primary_green"
-                                android:textSize="13sp"
-                                android:textStyle="bold"
-                                tools:text="FOUNDATIONS ENGLISH FOR ACCOUNTING" />
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_marginStart="8dp"
-                                android:contentDescription="Buka"
-                                android:src="@drawable/ic_arrow_up_right"
-                                app:tint="@color/primary_green" />
-
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/tvBookAuthorLatest"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="3"
-                            android:textColor="@color/text_muted"
-                            android:textSize="11sp"
-                            tools:text="M. Masqotul Imam Romadlani, Eka Susylowati, Meria Zakiyah Alfisuma, Fitriyatuz Zakiyah, Luthfi Awwalia · Pembelajaran" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:background="@android:color/transparent"
-                            android:fontFamily="@font/inter"
-                            android:text="Baru hadir"
-                            android:textColor="@color/outline_green"
-                            android:textSize="11.5sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Section 3: Rekomendasi Editor -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/lora"
-                    android:text="Rekomendasi editor"
-                    android:textColor="@color/primary_green"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvLihatPilihan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/inter"
-                    android:text="Lihat pilihan"
-                    android:textColor="@color/outline_green"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/layoutBookEditor"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardBackgroundColor="#EFF5F1"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="70dp"
-                        android:layout_height="95dp"
-                        app:cardBackgroundColor="@color/card_cream"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="0dp">
-
-                        <ImageView
-                            android:id="@+id/ivBookCoverEditor"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="Cover Rekomendasi Editor"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/img_konstruksi"
-                            tools:src="@drawable/img_konstruksi" />
-
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/tvBookTitleEditor"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter"
-                            android:textColor="@color/primary_green"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            tools:text="KONSTRUKSI TEORI BELAJAR PENDIDIKAN DASAR UNTUK MEWUJUDKAN PEMBELAJARAN BERKUALITAS" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:fontFamily="@font/inter"
-                            android:text="“Teman berpikir jernih di tengah derasnya informasi.”"
-                            android:textColor="@color/text_muted"
-                            android:textSize="11sp"
-                            android:textStyle="italic" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+                android:orientation="horizontal" />
 
         </LinearLayout>
 

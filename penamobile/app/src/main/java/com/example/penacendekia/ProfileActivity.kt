@@ -3,6 +3,8 @@ package com.example.penacendekia
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,6 +15,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.penacendekia.data.api.RetrofitClient
 import com.example.penacendekia.ui.PageTransition
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.card.MaterialCardView
@@ -66,10 +69,6 @@ class ProfileActivity : AppCompatActivity() {
         findViewById<MaterialCardView>(R.id.cardUserProfile)?.setOnClickListener { openEditProfile() }
         findViewById<android.view.View>(R.id.btnAccountData)?.setOnClickListener { openEditProfile() }
 
-        // 2. Settings button on header
-        findViewById<android.view.View>(R.id.btnSettingsProfile)?.setOnClickListener {
-            showQuickSettingsDialog()
-        }
 
         // 3. Quick Stats Cards -> Open Shelf / HistoryFavoriteActivity
         findViewById<MaterialCardView>(R.id.cardStatFinished)?.setOnClickListener {
@@ -157,6 +156,13 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
         bottomNav.selectedItemId = R.id.nav_profil
+
+        // Handle Back button to return to Beranda
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                PageTransition.switchTab(this@ProfileActivity, MainActivity::class.java)
+            }
+        })
     }
 
     override fun onResume() {
@@ -172,6 +178,7 @@ class ProfileActivity : AppCompatActivity() {
         val name = UserSessionManager.getUserName(this)
         val email = UserSessionManager.getUserEmail(this)
         val memberId = UserSessionManager.getMemberId(this)
+        val isAlya = email.trim().lowercase().contains("alya")
 
         tvProfileName.text = name
         tvProfileEmail.text = email
@@ -179,20 +186,29 @@ class ProfileActivity : AppCompatActivity() {
         tvCardMemberId.text = "ID: $memberId • Ketuk info"
 
         // Calculate initials from name
-        val initials = name.trim().split(Regex("\\s+"))
-            .mapNotNull { it.firstOrNull()?.uppercaseChar() }
-            .take(2)
-            .joinToString("")
-            .ifEmpty { "AP" }
+        val initials = if (isAlya) {
+            "AP"
+        } else {
+            name.trim().split(Regex("\\s+"))
+                .filter { it.isNotBlank() }
+                .mapNotNull { it.firstOrNull()?.uppercaseChar() }
+                .take(2)
+                .joinToString("")
+                .ifEmpty { email.firstOrNull { it.isLetter() }?.uppercase() ?: "P" }
+        }
         tvAvatarInitials.text = initials
     }
 
     private fun loadReadingStats() {
         val bookmarks = BookActivityStore.getBookmarks(this)
         val favorites = BookActivityStore.getFavorites(this)
-        tvStatFinishedCount.text = "18"
-        tvStatFavoritesCount.text = favorites.size.coerceAtLeast(2).toString()
-        tvStatBookmarksCount.text = bookmarks.size.coerceAtLeast(1).toString()
+        val finished = BookActivityStore.getFinishedBooks(this)
+        val email = UserSessionManager.getUserEmail(this).trim().lowercase()
+        val isAlya = email.contains("alya")
+
+        tvStatFinishedCount.text = if (isAlya) (finished.size.coerceAtLeast(18)).toString() else finished.size.toString()
+        tvStatFavoritesCount.text = if (isAlya) (favorites.size.coerceAtLeast(5)).toString() else favorites.size.toString()
+        tvStatBookmarksCount.text = if (isAlya) (bookmarks.size.coerceAtLeast(3)).toString() else bookmarks.size.toString()
     }
 
     private fun showEditProfileDialog() {
@@ -200,55 +216,45 @@ class ProfileActivity : AppCompatActivity() {
         val currentEmail = UserSessionManager.getUserEmail(this)
         val currentPhone = UserSessionManager.getUserPhone(this)
 
-        val container = android.widget.LinearLayout(this).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
-            setPadding(50, 20, 50, 10)
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_edit_profile, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val etName = dialogView.findViewById<EditText>(R.id.etEditProfileName)
+        val etEmail = dialogView.findViewById<EditText>(R.id.etEditProfileEmail)
+        val etPhone = dialogView.findViewById<EditText>(R.id.etEditProfilePhone)
+
+        etName?.setText(currentName)
+        etEmail?.setText(currentEmail)
+        etPhone?.setText(currentPhone)
+
+        dialogView.findViewById<android.view.View>(R.id.btnCancelEditProfile)?.setOnClickListener {
+            dialog.dismiss()
         }
 
-        val etName = EditText(this).apply {
-            hint = "Nama Lengkap"
-            setText(currentName)
-        }
-        val etEmail = EditText(this).apply {
-            hint = "Email"
-            setText(currentEmail)
-            inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-        }
-        val etPhone = EditText(this).apply {
-            hint = "Nomor Telepon / WhatsApp"
-            setText(currentPhone)
-            inputType = android.text.InputType.TYPE_CLASS_PHONE
-        }
-
-        container.addView(TextView(this).apply { text = "Nama Lengkap"; textSize = 12f; setTextColor(getColor(R.color.text_muted)) })
-        container.addView(etName)
-        container.addView(TextView(this).apply { text = "Email Akun"; textSize = 12f; setTextColor(getColor(R.color.text_muted)) })
-        container.addView(etEmail)
-        container.addView(TextView(this).apply { text = "Nomor Telepon"; textSize = 12f; setTextColor(getColor(R.color.text_muted)) })
-        container.addView(etPhone)
-
-        AlertDialog.Builder(this)
-            .setTitle("Edit Profil Pengguna")
-            .setView(container)
-            .setPositiveButton("Simpan") { _, _ ->
-                val newName = etName.text.toString().trim()
-                val newEmail = etEmail.text.toString().trim()
-                val newPhone = etPhone.text.toString().trim()
-                if (newName.isNotBlank()) {
-                    UserSessionManager.saveUser(
-                        this,
-                        name = newName,
-                        email = newEmail.ifBlank { UserSessionManager.getUserEmail(this) },
-                        phone = newPhone
-                    )
-                    loadUserProfile()
-                    Toast.makeText(this, "Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()
-                }
+        dialogView.findViewById<android.view.View>(R.id.btnSaveEditProfile)?.setOnClickListener {
+            val newName = etName?.text?.toString()?.trim().orEmpty()
+            val newEmail = etEmail?.text?.toString()?.trim().orEmpty()
+            val newPhone = etPhone?.text?.toString()?.trim().orEmpty()
+            if (newName.isNotBlank()) {
+                UserSessionManager.saveUser(
+                    this,
+                    name = newName,
+                    email = newEmail.ifBlank { UserSessionManager.getUserEmail(this) },
+                    phone = newPhone
+                )
+                loadUserProfile()
+                dialog.dismiss()
+                Toast.makeText(this, "Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Batal", null)
-            .show()
+        }
+
+        dialog.show()
     }
 
     private fun showDigitalMemberCardDialog() {
@@ -274,27 +280,6 @@ class ProfileActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showQuickSettingsDialog() {
-        val options = arrayOf(
-            "Tema Layaran Baca (Terang / Sepia / Gelap)",
-            "Pemberitahuan Buku Baru (Aktif)",
-            "Unduh Otomatis via Wi-Fi (Aktif)",
-            "Hapus Singgahan / Cache Aplikasi"
-        )
-        AlertDialog.Builder(this)
-            .setTitle("Pengaturan Umum")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> PageTransition.slideForward(this, Intent(this, ReaderAppearanceActivity::class.java))
-                    1 -> Toast.makeText(this, "Notifikasi buku baru tetap aktif", Toast.LENGTH_SHORT).show()
-                    2 -> Toast.makeText(this, "Mode unduh otomatis tersimpan", Toast.LENGTH_SHORT).show()
-                    3 -> Toast.makeText(this, "Cache aplikasi berhasil dibersihkan", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Tutup", null)
-            .show()
-    }
-
     private fun showMyReviewsDialog() {
         val options = arrayOf(
             "Tulis Ulasan untuk Buku Baru...",
@@ -314,129 +299,161 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun showChangePasswordDialog() {
-        val container = android.widget.LinearLayout(this).apply {
-            orientation = android.widget.LinearLayout.VERTICAL
-            setPadding(50, 20, 50, 10)
-        }
-        val etOldPass = EditText(this).apply {
-            hint = "Kata Sandi Saat Ini"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        }
-        val etNewPass = EditText(this).apply {
-            hint = "Kata Sandi Baru"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        }
-        val etConfirmPass = EditText(this).apply {
-            hint = "Konfirmasi Kata Sandi Baru"
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        }
-        container.addView(etOldPass)
-        container.addView(etNewPass)
-        container.addView(etConfirmPass)
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_change_password, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
 
-        AlertDialog.Builder(this)
-            .setTitle("Ubah Kata Sandi")
-            .setView(container)
-            .setPositiveButton("Simpan") { _, _ ->
-                val newP = etNewPass.text.toString()
-                val confP = etConfirmPass.text.toString()
-                if (newP.length >= 6 && newP == confP) {
-                    Toast.makeText(this, "Kata sandi berhasil diperbarui!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Pastikan kata sandi baru cocok dan minimal 6 karakter", Toast.LENGTH_LONG).show()
-                }
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val etOldPass = dialogView.findViewById<EditText>(R.id.etOldPassword)
+        val etNewPass = dialogView.findViewById<EditText>(R.id.etNewPassword)
+        val etConfirmPass = dialogView.findViewById<EditText>(R.id.etConfirmPassword)
+
+        dialogView.findViewById<android.view.View>(R.id.btnCancelPassword)?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<android.view.View>(R.id.btnSavePassword)?.setOnClickListener {
+            val oldP = etOldPass?.text?.toString()?.trim().orEmpty()
+            val newP = etNewPass?.text?.toString()?.trim().orEmpty()
+            val confP = etConfirmPass?.text?.toString()?.trim().orEmpty()
+
+            if (oldP.isEmpty()) {
+                Toast.makeText(this, "Masukkan kata sandi saat ini", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            .setNegativeButton("Batal", null)
-            .show()
+
+            if (newP.length < 6) {
+                Toast.makeText(this, "Kata sandi baru minimal 6 karakter", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (newP != confP) {
+                Toast.makeText(this, "Konfirmasi kata sandi baru tidak cocok", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            dialog.dismiss()
+            Toast.makeText(this, "Kata sandi berhasil diperbarui!", Toast.LENGTH_SHORT).show()
+        }
+
+        dialog.show()
     }
 
     private fun showPrivacySecurityDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Privasi & Keamanan Akun")
-            .setMessage(
-                """
-                Keamanan Akun Anda:
-                • Enkripsi Sandi: Bcrypt (Standar Industri)
-                • Autentikasi Google: OAuth 2.0 Resmi
-                • Data Pribadi: Dijaga kerahasiaannya sesuai ketentuan undang-undang perlindungan data.
-                """.trimIndent()
-            )
-            .setPositiveButton("Mengerti", null)
-            .show()
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_privacy_security, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialogView.findViewById<android.view.View>(R.id.btnDismissPrivacy)?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showHelpCenterDialog() {
-        val options = arrayOf(
-            "Kirim Surel ke Tim Bantuan (support@penacendekia.com)",
-            "Hubungi Layanan WhatsApp Admin",
-            "Buka Portal Tanya Jawab / FAQ"
-        )
-        AlertDialog.Builder(this)
-            .setTitle("Pusat Bantuan")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> {
-                        try {
-                            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("mailto:support@penacendekia.com")
-                                putExtra(Intent.EXTRA_SUBJECT, "Pertanyaan Layanan Pena Cendekia")
-                            }
-                            startActivity(intent)
-                        } catch (e: Exception) {
-                            Toast.makeText(this, "Surel: support@penacendekia.com", Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    1 -> {
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/6281234567890"))
-                            startActivity(intent)
-                        } catch (e: Exception) {
-                            Toast.makeText(this, "WhatsApp: +62 812-3456-7890", Toast.LENGTH_LONG).show()
-                        }
-                    }
-                    2 -> openAuthorDashboard()
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_help_center, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialogView.findViewById<android.view.View>(R.id.btnHelpEmail)?.setOnClickListener {
+            dialog.dismiss()
+            try {
+                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = Uri.parse("mailto:penacendekiasby@gmail.com")
+                    putExtra(Intent.EXTRA_SUBJECT, "Pertanyaan Layanan Pena Cendekia")
                 }
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "Surel: penacendekiasby@gmail.com", Toast.LENGTH_LONG).show()
             }
-            .setNegativeButton("Tutup", null)
-            .show()
+        }
+
+        dialogView.findViewById<android.view.View>(R.id.btnHelpWhatsApp)?.setOnClickListener {
+            dialog.dismiss()
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/6285785522283"))
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "WhatsApp: 0857-8552-2283", Toast.LENGTH_LONG).show()
+            }
+        }
+
+        dialogView.findViewById<android.view.View>(R.id.btnHelpFaq)?.setOnClickListener {
+            dialog.dismiss()
+            openContactPage()
+        }
+
+        dialogView.findViewById<android.view.View>(R.id.btnDismissHelp)?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showAboutPublisherDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Tentang Penerbit")
-            .setMessage(
-                """
-                PT PENA CENDEKIA PUSTAKA
-                Penerbit Buku & E-Book Akademik Terpercaya di Indonesia.
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_about_publisher, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
 
-                • Anggota Resmi IKAPI: No. 638/JTI/2023
-                • Versi Aplikasi: 1.0.0 (API 29+ Ready)
-                • Fokus: Karya Ilmiah, Buku Ajar, Prosiding, Monograf, dan Transformasi Literasi Digital Nusantara.
-                """.trimIndent()
-            )
-            .setPositiveButton("Tutup", null)
-            .show()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialogView.findViewById<android.view.View>(R.id.btnDismissAbout)?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showLogoutConfirmDialog() {
-        AlertDialog.Builder(this)
-            .setTitle("Keluar Akun")
-            .setMessage("Apakah Anda yakin ingin keluar dari akun Pena Cendekia?")
-            .setPositiveButton("Keluar") { _, _ ->
-                UserSessionManager.clearSession(this)
-                val intent = Intent(this, LoginActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-                startActivity(intent)
-                finish()
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_logout_confirm, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        // Background transparan agar sudut rounded MaterialCardView tampil rapi tanpa kotak abu-abu sistem
+        dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+        dialogView.findViewById<android.view.View>(R.id.btnCancelLogout)?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogView.findViewById<android.view.View>(R.id.btnConfirmLogout)?.setOnClickListener {
+            dialog.dismiss()
+            UserSessionManager.clearSession(this)
+            val intent = Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
-            .setNegativeButton("Batal", null)
-            .show()
+            startActivity(intent)
+            finish()
+        }
+
+        dialog.show()
     }
 
     private fun openAuthorDashboard() {
         try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(AUTHOR_DASHBOARD_URL))
+            val authorUrl = "http://${RetrofitClient.currentHost}:${RetrofitClient.PORT}/login"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(authorUrl))
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Tidak dapat membuka peramban web", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun openContactPage() {
+        try {
+            val contactUrl = "http://${RetrofitClient.currentHost}:${RetrofitClient.PORT}/contact"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(contactUrl))
             startActivity(intent)
         } catch (e: Exception) {
             Toast.makeText(this, "Tidak dapat membuka peramban web", Toast.LENGTH_SHORT).show()

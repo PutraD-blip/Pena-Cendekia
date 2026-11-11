@@ -50,6 +50,9 @@ dependencies {
     // Google Sign-In (Google Play Services Auth)
     implementation("com.google.android.gms:play-services-auth:21.2.0")
 
+    // ML Kit On-Device Text Recognition for Word-like text selection in PDF
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

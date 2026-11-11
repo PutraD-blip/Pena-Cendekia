@@ -5,7 +5,7 @@
     android:id="@+id/layoutAppearanceRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4E8D3"
+    android:background="#181E1B"
     tools:context=".ReaderAppearanceActivity">
 
     <!-- Top Header Bar -->
@@ -28,7 +28,7 @@
             android:contentDescription="Kembali"
             android:padding="4dp"
             android:src="@drawable/ic_back"
-            app:tint="#203C32" />
+            app:tint="#A7D7C5" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -43,10 +43,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:maxLines="2"
-                android:text="Digitalisasi Pendidikan Islam"
-                android:textColor="#203C32"
-                android:textSize="18sp"
+                android:maxLines="1"
+                android:text="Asuhan Kebidanan Pada Kehamilan"
+                android:textColor="#A7D7C5"
+                android:textSize="17sp"
                 android:fontFamily="@font/lora"
                 app:fontFamily="@font/lora"
                 android:textStyle="bold" />
@@ -58,8 +58,8 @@
                 android:layout_marginTop="2dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Pratinjau tema sepia · halaman 42"
-                android:textColor="#556B60"
+                android:text="Tema Gelap"
+                android:textColor="#8E9F97"
                 android:textSize="12sp"
                 android:fontFamily="@font/inter"
                 app:fontFamily="@font/inter" />
@@ -74,9 +74,52 @@
             android:contentDescription="Bookmark"
             android:padding="4dp"
             android:src="@drawable/ic_bookmark_check"
-            app:tint="#203C32" />
+            app:tint="#A7D7C5" />
 
     </LinearLayout>
+
+    <!-- Real PDF Page Preview Container -->
+    <FrameLayout
+        android:id="@+id/layoutPreviewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/cardAppearanceSheet"
+        android:layout_below="@id/toolbarAppearance"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardPdfPreview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="6dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp">
+
+            <ImageView
+                android:id="@+id/ivAppearancePdfPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:contentDescription="Pratinjau Halaman Naskah"
+                android:scaleType="fitCenter" />
+
+            <!-- Loading indicator for preview render -->
+            <ProgressBar
+                android:id="@+id/pbPreviewLoading"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/primary_green"
+                android:visibility="gone" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </FrameLayout>
 
     <!-- Tampilan Baca Bottom Sheet Container Card -->
     <com.google.android.material.card.MaterialCardView
@@ -110,7 +153,7 @@
                     android:layout_alignParentStart="true"
                     android:text="Tampilan Baca"
                     android:textColor="#203C32"
-                    android:textSize="20sp"
+                    android:textSize="19sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -120,85 +163,16 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:background="?attr/selectableItemBackground"
-                    android:paddingHorizontal="4dp"
-                    android:paddingVertical="2dp"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="4dp"
                     android:text="Selesai"
-                    android:textColor="#203C32"
-                    android:textSize="13.5sp"
+                    android:textColor="@color/primary_green"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
             </RelativeLayout>
 
-            <!-- Section 1: Ukuran teks -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:id="@+id/tvSectionTextSize"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:text="Ukuran teks"
-                    android:textColor="#203C32"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvFontSizeValue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="18 px"
-                    android:textColor="@color/text_muted"
-                    android:textSize="13sp" />
-
-            </RelativeLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="A"
-                    android:textColor="@color/text_muted"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <SeekBar
-                    android:id="@+id/seekBarFontSize"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:max="20"
-                    android:progress="6"
-                    android:progressTint="#203C32"
-                    android:thumbTint="#203C32" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="A"
-                    android:textColor="#203C32"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <!-- Divider -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="16dp"
-                android:background="@color/divider_color" />
-
-            <!-- Section 3: Tema layar -->
+            <!-- Section: Tema layar (Terang, Gelap, Sepia) -->
             <TextView
                 android:id="@+id/tvSectionScreenTheme"
                 android:layout_width="match_parent"
@@ -206,7 +180,7 @@
                 android:layout_marginBottom="12dp"
                 android:text="Tema layar"
                 android:textColor="#203C32"
-                android:textSize="13sp"
+                android:textSize="13.5sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -219,7 +193,7 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardThemeTerang"
                     android:layout_width="0dp"
-                    android:layout_height="72dp"
+                    android:layout_height="68dp"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
                     app:cardBackgroundColor="#F8F6EF"
@@ -240,7 +214,7 @@
                             android:layout_height="wrap_content"
                             android:text="Aa"
                             android:textColor="#203C32"
-                            android:textSize="20sp"
+                            android:textSize="19sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -260,14 +234,14 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardThemeGelap"
                     android:layout_width="0dp"
-                    android:layout_height="72dp"
+                    android:layout_height="68dp"
                     android:layout_marginHorizontal="3dp"
                     android:layout_weight="1"
                     app:cardBackgroundColor="#222B26"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="#222B26"
-                    app:strokeWidth="1dp">
+                    app:strokeColor="@color/primary_green"
+                    app:strokeWidth="2dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -281,7 +255,7 @@
                             android:layout_height="wrap_content"
                             android:text="Aa"
                             android:textColor="#FFFFFF"
-                            android:textSize="20sp"
+                            android:textSize="19sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -289,26 +263,27 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Gelap"
+                            android:text="✓ Gelap"
                             android:textColor="#FFFFFF"
-                            android:textSize="11.5sp" />
+                            android:textSize="11.5sp"
+                            android:textStyle="bold" />
 
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Theme 3: Sepia (Selected) -->
+                <!-- Theme 3: Sepia -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardThemeSepia"
                     android:layout_width="0dp"
-                    android:layout_height="72dp"
+                    android:layout_height="68dp"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
                     app:cardBackgroundColor="#EFE2C9"
                     app:cardCornerRadius="10dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="#203C32"
-                    app:strokeWidth="1.5dp">
+                    app:strokeColor="@color/divider_color"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -322,7 +297,7 @@
                             android:layout_height="wrap_content"
                             android:text="Aa"
                             android:textColor="#584A35"
-                            android:textSize="20sp"
+                            android:textSize="19sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -330,10 +305,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="✓ Sepia"
+                            android:text="Sepia"
                             android:textColor="#584A35"
-                            android:textSize="11.5sp"
-                            android:textStyle="bold" />
+                            android:textSize="11.5sp" />
 
                     </LinearLayout>
 
@@ -345,70 +319,12 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Preferensi disimpan otomatis untuk bacaan berikutnya."
+                android:text="Preferensi tema disimpan otomatis untuk bacaan berikutnya."
                 android:textColor="@color/text_muted"
                 android:textSize="11.5sp" />
 
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
-
-    <!-- Reading Content Scroll View -->
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scrollViewAppearance"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/cardAppearanceSheet"
-        android:layout_below="@id/toolbarAppearance"
-        android:clipToPadding="false"
-        android:paddingBottom="120dp"
-        android:fillViewport="true"
-        android:isScrollContainer="true"
-        android:overScrollMode="never">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="8dp">
-
-            <!-- Chapter Title: Strategi Perumusan Visi Lembaga -->
-            <TextView
-                android:id="@+id/tvChapterTitleAppearance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:text="Strategi Perumusan Visi Lembaga"
-                android:textColor="#203C32"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <!-- Paragraph 1 -->
-            <TextView
-                android:id="@+id/tvParagraphAppearance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:lineSpacingExtra="6sp"
-                android:text="Pengembangan lembaga pendidikan Islam yang unggul membutuhkan landasan kepemimpinan yang berorientasi pada masa depan. Seorang pemimpin visioner tidak hanya bertugas merumuskan arah strategis, tetapi juga harus mampu mengintegrasikan nilai-nilai keislaman ke dalam seluruh ekosistem organisasi."
-                android:textColor="#203C32"
-                android:textSize="15sp" />
-
-            <!-- Page Number Center Line -->
-            <TextView
-                android:id="@+id/tvPageCenterAppearance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="12dp"
-                android:gravity="center"
-                android:text="42 / 240 halaman"
-                android:textColor="#7A6A55"
-                android:textSize="12.5sp" />
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>
 
 </RelativeLayout>

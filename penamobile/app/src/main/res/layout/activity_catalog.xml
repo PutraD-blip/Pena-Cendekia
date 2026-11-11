@@ -370,12 +370,18 @@
                     android:textSize="13sp" />
 
                 <LinearLayout
+                    android:id="@+id/btnSortCatalog"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:padding="4dp">
 
                     <TextView
+                        android:id="@+id/tvCurrentSortLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="4dp"

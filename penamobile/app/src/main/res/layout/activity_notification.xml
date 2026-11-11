@@ -14,9 +14,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:paddingHorizontal="20dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="12dp">
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp">
 
         <ImageView
             android:id="@+id/btnBackNotification"
@@ -37,6 +39,7 @@
             android:layout_marginStart="12dp"
             android:layout_toEndOf="@id/btnBackNotification"
             android:fontFamily="@font/lora"
+            android:includeFontPadding="false"
             android:text="Notifikasi Buku Baru"
             android:textColor="@color/primary_green"
             android:textSize="20sp"

@@ -1,13 +1,19 @@
 package com.example.penacendekia
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.pdf.PdfRenderer
 import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
+import android.os.Handler
+import android.os.Looper
+import android.os.ParcelFileDescriptor
+import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.RelativeLayout
-import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
@@ -19,23 +25,31 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.penacendekia.data.model.Book
 import com.example.penacendekia.ui.PageTransition
 import com.google.android.material.card.MaterialCardView
+import java.io.File
+import java.io.FileOutputStream
+import java.util.concurrent.Executors
 
 class ReaderAppearanceActivity : AppCompatActivity() {
     private lateinit var layoutAppearanceRoot: RelativeLayout
+    private lateinit var toolbarAppearance: LinearLayout
     private lateinit var tvBookTitleAppearance: TextView
     private lateinit var tvSubtitleAppearance: TextView
-    private lateinit var tvChapterTitleAppearance: TextView
-    private lateinit var tvParagraphAppearance: TextView
-    private lateinit var tvFontSizeValue: TextView
-    private lateinit var seekBarFontSize: SeekBar
+    private lateinit var btnBookmarkAppearance: ImageView
+
+    private lateinit var ivAppearancePdfPreview: ImageView
+    private lateinit var pbPreviewLoading: ProgressBar
+    private lateinit var cardPdfPreview: MaterialCardView
+
     private lateinit var cardThemeTerang: MaterialCardView
     private lateinit var cardThemeGelap: MaterialCardView
     private lateinit var cardThemeSepia: MaterialCardView
-    private lateinit var btnBookmarkAppearance: ImageView
+
     private lateinit var readerBook: Book
-    private var currentPage = 42
-    private var currentTheme = "SEPIA"
-    private var currentFontSize = 16
+    private var currentPage = 1
+    private var currentTheme = "GELAP"
+
+    private var pdfRenderer: PdfRenderer? = null
+    private var pdfPfd: ParcelFileDescriptor? = null
 
     companion object {
         const val PREFS_READER = "reader_prefs"
@@ -52,9 +66,10 @@ class ReaderAppearanceActivity : AppCompatActivity() {
         val statusBarHeight = if (resId > 0) resources.getDimensionPixelSize(resId)
         else (24 * resources.displayMetrics.density).toInt()
         val extraTop = (24 * resources.displayMetrics.density).toInt()
-        val toolbar = findViewById<android.widget.LinearLayout>(R.id.toolbarAppearance)
-        toolbar.setPadding(toolbar.paddingLeft, statusBarHeight + extraTop, toolbar.paddingRight, toolbar.paddingBottom)
-        ViewCompat.setOnApplyWindowInsetsListener(toolbar) { view, insets ->
+
+        toolbarAppearance = findViewById(R.id.toolbarAppearance)
+        toolbarAppearance.setPadding(toolbarAppearance.paddingLeft, statusBarHeight + extraTop, toolbarAppearance.paddingRight, toolbarAppearance.paddingBottom)
+        ViewCompat.setOnApplyWindowInsetsListener(toolbarAppearance) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val topBar = if (systemBars.top > 0) systemBars.top else statusBarHeight
             view.setPadding(view.paddingLeft, topBar + extraTop, view.paddingRight, view.paddingBottom)
@@ -64,41 +79,45 @@ class ReaderAppearanceActivity : AppCompatActivity() {
         layoutAppearanceRoot = findViewById(R.id.layoutAppearanceRoot)
         tvBookTitleAppearance = findViewById(R.id.tvBookTitleAppearance)
         tvSubtitleAppearance = findViewById(R.id.tvSubtitleAppearance)
-        tvChapterTitleAppearance = findViewById(R.id.tvChapterTitleAppearance)
-        tvParagraphAppearance = findViewById(R.id.tvParagraphAppearance)
-        tvFontSizeValue = findViewById(R.id.tvFontSizeValue)
-        seekBarFontSize = findViewById(R.id.seekBarFontSize)
+        btnBookmarkAppearance = findViewById(R.id.btnBookmarkAppearance)
+
+        ivAppearancePdfPreview = findViewById(R.id.ivAppearancePdfPreview)
+        pbPreviewLoading = findViewById(R.id.pbPreviewLoading)
+        cardPdfPreview = findViewById(R.id.cardPdfPreview)
+
         cardThemeTerang = findViewById(R.id.cardThemeTerang)
         cardThemeGelap = findViewById(R.id.cardThemeGelap)
         cardThemeSepia = findViewById(R.id.cardThemeSepia)
-        btnBookmarkAppearance = findViewById(R.id.btnBookmarkAppearance)
 
         readerBook = getBookFromIntent() ?: Book(
             id = -1,
-            title = "Kepemimpinan Visioner Di Lembaga Pendidikan Islam",
-            author = "Dr. Ahmad Zain Sarnoto"
+            title = "Asuhan Kebidanan Pada Kehamilan",
+            author = "Dianita Primihastuti, S.ST., M.Keb., dkk."
         )
-        currentPage = intent.getIntExtra(ReaderActivity.EXTRA_PAGE, 42).coerceAtLeast(1)
+        currentPage = intent.getIntExtra(ReaderActivity.EXTRA_PAGE, 1).coerceAtLeast(1)
         tvBookTitleAppearance.text = readerBook.title
 
-        // Read saved appearance preferences
+        // Baca preferensi tersimpan
         val prefs = getSharedPreferences(PREFS_READER, Context.MODE_PRIVATE)
-        currentFontSize = prefs.getInt(KEY_FONT_SIZE, 16)
-        currentTheme = prefs.getString(KEY_READER_THEME, "SEPIA") ?: "SEPIA"
+        currentTheme = prefs.getString(KEY_READER_THEME, "GELAP") ?: "GELAP"
 
-        // Set initial font size UI
-        val progress = (currentFontSize - 12).coerceIn(0, 20)
-        seekBarFontSize.progress = progress
-        tvFontSizeValue.text = "$currentFontSize px"
-        tvParagraphAppearance.setTextSize(TypedValue.COMPLEX_UNIT_SP, currentFontSize.toFloat())
-        tvChapterTitleAppearance.setTextSize(TypedValue.COMPLEX_UNIT_SP, (currentFontSize + 6).toFloat())
+        // Setup Themes
+        cardThemeTerang.setOnClickListener { applyTheme("TERANG") }
+        cardThemeGelap.setOnClickListener { applyTheme("GELAP") }
+        cardThemeSepia.setOnClickListener { applyTheme("SEPIA") }
 
+        // Navigation
         findViewById<ImageView>(R.id.btnBackAppearance)?.setOnClickListener {
             PageTransition.slideBackward(this)
         }
         onBackPressedDispatcher.addCallback(this) {
             PageTransition.slideBackward(this@ReaderAppearanceActivity)
         }
+        findViewById<TextView>(R.id.btnDoneAppearance)?.setOnClickListener {
+            Toast.makeText(this, "Pengaturan tampilan diterapkan!", Toast.LENGTH_SHORT).show()
+            PageTransition.slideBackward(this)
+        }
+
         btnBookmarkAppearance.setOnClickListener {
             val isSaved = BookActivityStore.togglePageBookmark(this, readerBook, currentPage)
             updateBookmarkButton()
@@ -109,47 +128,139 @@ class ReaderAppearanceActivity : AppCompatActivity() {
             ).show()
         }
 
-        findViewById<TextView>(R.id.btnDoneAppearance)?.setOnClickListener {
-            Toast.makeText(this, "Pengaturan tampilan disimpan!", Toast.LENGTH_SHORT).show()
-            PageTransition.slideBackward(this)
-        }
+        applyTheme(currentTheme, notifyUser = false)
+        updateBookmarkButton()
 
-        seekBarFontSize.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                currentFontSize = 12 + progress
-                tvFontSizeValue.text = "$currentFontSize px"
-                tvParagraphAppearance.setTextSize(TypedValue.COMPLEX_UNIT_SP, currentFontSize.toFloat())
-                tvChapterTitleAppearance.setTextSize(TypedValue.COMPLEX_UNIT_SP, (currentFontSize + 6).toFloat())
-                if (fromUser) {
-                    prefs.edit().putInt(KEY_FONT_SIZE, currentFontSize).apply()
+        // Render pratinjau halaman PDF nyata
+        loadPdfPagePreview()
+    }
+
+    private fun loadPdfPagePreview() {
+        pbPreviewLoading.visibility = View.VISIBLE
+        Executors.newSingleThreadExecutor().execute {
+            val safeId = if (readerBook.id > 0) readerBook.id else readerBook.title.hashCode()
+            val cacheFile = File(File(cacheDir, "ebooks"), "ebook_${safeId}.pdf")
+            var targetFile: File? = null
+
+            if (cacheFile.exists() && cacheFile.length() > 2048) {
+                targetFile = cacheFile
+            } else {
+                val titleLower = readerBook.title.lowercase()
+                val isAsuhanKebidanan = readerBook.id == 3 || readerBook.id == 1003 ||
+                        titleLower.contains("asuhan") ||
+                        titleLower.contains("kebidanan") ||
+                        titleLower.contains("kehamilan")
+
+                val assetName = if (isAsuhanKebidanan) "ebooks/asuhan_kebidanan.pdf" else "ebooks/ebook_${safeId}.pdf"
+                try {
+                    val input = assets.open(assetName)
+                    val dir = File(cacheDir, "ebooks").apply { if (!exists()) mkdirs() }
+                    val temp = File(dir, "preview_${safeId}.pdf")
+                    FileOutputStream(temp).use { out -> input.copyTo(out) }
+                    input.close()
+                    if (temp.exists() && temp.length() > 2048) {
+                        targetFile = temp
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
 
-            override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
-            override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
-        })
+            if (targetFile != null && targetFile.exists()) {
+                try {
+                    val pfd = ParcelFileDescriptor.open(targetFile, ParcelFileDescriptor.MODE_READ_ONLY)
+                    pdfPfd = pfd
+                    val renderer = PdfRenderer(pfd)
+                    pdfRenderer = renderer
 
-        cardThemeTerang.setOnClickListener { applyTheme("TERANG") }
-        cardThemeGelap.setOnClickListener { applyTheme("GELAP") }
-        cardThemeSepia.setOnClickListener { applyTheme("SEPIA") }
+                    val pageIndex = (currentPage - 1).coerceIn(0, renderer.pageCount - 1)
+                    val page = renderer.openPage(pageIndex)
 
-        applyTheme(currentTheme, notifyUser = false)
-    }
+                    val displayMetrics = resources.displayMetrics
+                    val targetWidth = (displayMetrics.widthPixels - (48 * displayMetrics.density).toInt()).coerceAtLeast(300)
+                    val scale = targetWidth.toFloat() / page.width.toFloat()
+                    val targetHeight = (page.height * scale).toInt().coerceAtLeast(450)
 
-    override fun onResume() {
-        super.onResume()
-        if (::readerBook.isInitialized) updateBookmarkButton()
-    }
+                    val bitmap = Bitmap.createBitmap(targetWidth, targetHeight, Bitmap.Config.ARGB_8888)
+                    val canvas = android.graphics.Canvas(bitmap)
+                    canvas.drawColor(Color.WHITE)
+                    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    page.close()
 
-    private fun getBookFromIntent(): Book? = try {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra(ReaderActivity.EXTRA_BOOK, Book::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getSerializableExtra(ReaderActivity.EXTRA_BOOK) as? Book
+                    Handler(Looper.getMainLooper()).post {
+                        pbPreviewLoading.visibility = View.GONE
+                        ivAppearancePdfPreview.setImageBitmap(bitmap)
+                    }
+                    return@execute
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            Handler(Looper.getMainLooper()).post {
+                pbPreviewLoading.visibility = View.GONE
+                ivAppearancePdfPreview.setImageResource(R.drawable.img_asuhan_kebidanan_pada_kehamilan)
+            }
         }
-    } catch (exception: ClassCastException) {
-        null
+    }
+
+    private fun applyTheme(theme: String, notifyUser: Boolean = true) {
+        currentTheme = theme
+        val prefs = getSharedPreferences(PREFS_READER, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_READER_THEME, currentTheme).apply()
+
+        val primaryGreen = ContextCompat.getColor(this, R.color.primary_green)
+        val dividerColor = ContextCompat.getColor(this, R.color.divider_color)
+        val selectedStroke = (2 * resources.displayMetrics.density).toInt()
+
+        val background: Int
+        val headingColor: Int
+        val mutedColor: Int
+
+        when (theme) {
+            "TERANG" -> {
+                background = ContextCompat.getColor(this, R.color.bg_cream)
+                headingColor = ContextCompat.getColor(this, R.color.primary_green)
+                mutedColor = ContextCompat.getColor(this, R.color.text_muted)
+            }
+            "GELAP" -> {
+                background = Color.parseColor("#181E1B")
+                headingColor = Color.parseColor("#A7D7C5")
+                mutedColor = Color.parseColor("#8E9F97")
+            }
+            else -> { // "SEPIA"
+                background = Color.parseColor("#F4E8D3")
+                headingColor = Color.parseColor("#203C32")
+                mutedColor = Color.parseColor("#7A6A55")
+            }
+        }
+
+        layoutAppearanceRoot.setBackgroundColor(background)
+        toolbarAppearance.setBackgroundColor(background)
+        tvBookTitleAppearance.setTextColor(headingColor)
+        tvSubtitleAppearance.setTextColor(mutedColor)
+        findViewById<ImageView>(R.id.btnBackAppearance)?.setColorFilter(headingColor)
+        btnBookmarkAppearance.setColorFilter(headingColor)
+
+        val themeCards = listOf(
+            "TERANG" to cardThemeTerang,
+            "GELAP" to cardThemeGelap,
+            "SEPIA" to cardThemeSepia
+        )
+        themeCards.forEach { (name, card) ->
+            val selected = name == theme
+            card.strokeColor = if (selected) primaryGreen else dividerColor
+            card.strokeWidth = if (selected) selectedStroke else 1
+        }
+        findViewById<TextView>(R.id.tvLabelTerang)?.text = if (theme == "TERANG") "✓ Terang" else "Terang"
+        findViewById<TextView>(R.id.tvLabelGelap)?.text = if (theme == "GELAP") "✓ Gelap" else "Gelap"
+        findViewById<TextView>(R.id.tvLabelSepia)?.text = if (theme == "SEPIA") "✓ Sepia" else "Sepia"
+
+        tvSubtitleAppearance.text = "Tema ${theme.lowercase().replaceFirstChar { it.uppercase() }}"
+
+        if (notifyUser) {
+            Toast.makeText(this, "Tema ${theme.lowercase().replaceFirstChar { it.uppercase() }} diterapkan", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun updateBookmarkButton() {
@@ -161,62 +272,20 @@ class ReaderAppearanceActivity : AppCompatActivity() {
             if (isSaved) "Hapus penanda halaman" else "Simpan halaman"
     }
 
-    private fun applyTheme(theme: String, notifyUser: Boolean = true) {
-        currentTheme = theme
-        val prefs = getSharedPreferences(PREFS_READER, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_READER_THEME, currentTheme).apply()
-
-        val primaryGreen = ContextCompat.getColor(this, R.color.primary_green)
-        val dividerColor = ContextCompat.getColor(this, R.color.divider_color)
-        val selectedStroke = (2 * resources.displayMetrics.density).toInt()
-        val background: Int
-        val foreground: Int
-        val muted: Int
-        when (theme) {
-            "TERANG" -> {
-                background = Color.WHITE
-                foreground = Color.parseColor("#203C32")
-                muted = Color.parseColor("#68766E")
-            }
-            "GELAP" -> {
-                background = Color.parseColor("#222B26")
-                foreground = Color.WHITE
-                muted = Color.parseColor("#A0AFA6")
-            }
-            else -> {
-                background = Color.parseColor("#F4E8D3")
-                foreground = Color.parseColor("#584A35")
-                muted = Color.parseColor("#7A6A55")
-            }
+    private fun getBookFromIntent(): Book? = try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra(ReaderActivity.EXTRA_BOOK, Book::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getSerializableExtra(ReaderActivity.EXTRA_BOOK) as? Book
         }
+    } catch (_: ClassCastException) {
+        null
+    }
 
-        layoutAppearanceRoot.setBackgroundColor(background)
-        tvBookTitleAppearance.setTextColor(foreground)
-        tvSubtitleAppearance.setTextColor(muted)
-        tvChapterTitleAppearance.setTextColor(foreground)
-        tvParagraphAppearance.setTextColor(foreground)
-        findViewById<TextView>(R.id.tvPageCenterAppearance)?.setTextColor(muted)
-        findViewById<ImageView>(R.id.btnBackAppearance)?.setColorFilter(foreground)
-        btnBookmarkAppearance.setColorFilter(foreground)
-
-        val themeCards = listOf(
-            "TERANG" to cardThemeTerang,
-            "GELAP" to cardThemeGelap,
-            "SEPIA" to cardThemeSepia
-        )
-        themeCards.forEach { (name, card) ->
-            val selected = name == theme
-            card.strokeColor = if (selected) primaryGreen else dividerColor
-            card.strokeWidth = if (selected) selectedStroke else 0
-        }
-        findViewById<TextView>(R.id.tvLabelTerang)?.text = if (theme == "TERANG") "✓ Terang" else "Terang"
-        findViewById<TextView>(R.id.tvLabelGelap)?.text = if (theme == "GELAP") "✓ Gelap" else "Gelap"
-        findViewById<TextView>(R.id.tvLabelSepia)?.text = if (theme == "SEPIA") "✓ Sepia" else "Sepia"
-
-        tvSubtitleAppearance.text = "Tema ${theme.lowercase().replaceFirstChar { it.uppercase() }} · Vertikal Scroll"
-
-        if (notifyUser) {
-            Toast.makeText(this, "Tema ${theme.lowercase().replaceFirstChar { it.uppercase() }} diterapkan", Toast.LENGTH_SHORT).show()
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        try { pdfRenderer?.close() } catch (_: Exception) {}
+        try { pdfPfd?.close() } catch (_: Exception) {}
     }
 }

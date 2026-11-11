@@ -29,7 +29,11 @@ class ShelfBookDetailActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.toolbarShelfDetail)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(v.paddingLeft, systemBars.top, v.paddingRight, v.paddingBottom)
+            val lp = v.layoutParams as? android.view.ViewGroup.MarginLayoutParams
+            if (lp != null && lp.topMargin != systemBars.top) {
+                lp.topMargin = systemBars.top
+                v.layoutParams = lp
+            }
             insets
         }
 
@@ -70,8 +74,7 @@ class ShelfBookDetailActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvShelfDetailIsbn)?.text = "ISBN: ${shelfBook.isbn ?: "978-623-8123-01-4"}"
         val ivCover = findViewById<ImageView>(R.id.ivShelfDetailCover)
         if (ivCover != null) {
-            val cover = BookCoverResolver.localCover(shelfBook) ?: R.drawable.img_digitalisasi_cover
-            Glide.with(this).load(shelfBook.cover_url ?: cover).placeholder(cover).error(cover).into(ivCover)
+            BookCoverResolver.loadCover(ivCover, shelfBook)
         }
         findViewById<ImageView>(R.id.btnFavoriteShelfDetail)?.setOnClickListener {
             val isFavorite = BookActivityStore.toggleFavorite(this, shelfBook)
@@ -85,10 +88,17 @@ class ShelfBookDetailActivity : AppCompatActivity() {
         updateFavoriteStatus(BookActivityStore.isFavorite(this, shelfBook))
 
         findViewById<Button>(R.id.btnActionReadShelf)?.setOnClickListener {
+            val bookmarked = BookActivityStore.getPageBookmark(this, shelfBook)?.page
+            val activeSessionPage = BookActivityStore.getActiveSessions(this)
+                .find { BookActivityStore.bookKey(it.book) == BookActivityStore.bookKey(shelfBook) }
+                ?.currentPage
+            val targetPage = (bookmarked ?: activeSessionPage ?: 1).coerceAtLeast(1)
+
             PageTransition.slideForward(
                 this,
                 Intent(this, ReaderActivity::class.java)
                     .putExtra(ReaderActivity.EXTRA_BOOK, shelfBook)
+                    .putExtra(ReaderActivity.EXTRA_PAGE, targetPage)
             )
         }
 

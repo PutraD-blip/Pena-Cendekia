@@ -14,9 +14,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:paddingHorizontal="20dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="12dp">
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp">
 
         <ImageView
             android:id="@+id/btnBackHistory"
@@ -37,6 +39,7 @@
             android:layout_marginStart="12dp"
             android:layout_toEndOf="@id/btnBackHistory"
             android:fontFamily="@font/lora"
+            android:includeFontPadding="false"
             android:text="Riwayat &amp; Favorit"
             android:textColor="@color/primary_green"
             android:textSize="22sp"
@@ -117,10 +120,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter"
+                            android:text="0"
                             android:textColor="@color/primary_green"
                             android:textSize="28sp"
                             android:textStyle="bold"
-                            tools:text="18" />
+                            tools:text="0" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -146,10 +150,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter"
+                            android:text="0"
                             android:textColor="@color/primary_green"
                             android:textSize="28sp"
                             android:textStyle="bold"
-                            tools:text="2" />
+                            tools:text="0" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -195,12 +200,30 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/historyListContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+            <TextView
+                android:id="@+id/tvHistoryEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/inter"
+                android:text="Belum ada riwayat buku yang selesai dibaca."
+                android:textColor="@color/text_muted"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
             <!-- Riwayat Item 1 -->
             <LinearLayout
                 android:id="@+id/layoutHistoryBook1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
@@ -217,7 +240,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Cover Buku"
                         android:scaleType="centerCrop"
-                        tools:src="@drawable/img_administrasi_cover" />
+                        tools:src="@drawable/img_administrasi_rekam_medis" />
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -335,6 +358,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
@@ -522,6 +546,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
@@ -538,7 +563,7 @@
                         android:layout_height="match_parent"
                         android:contentDescription="Cover Buku"
                         android:scaleType="centerCrop"
-                        tools:src="@drawable/img_digitalisasi_cover" />
+                        tools:src="@drawable/img_digitalisasi_pendidikan_islam_cover" />
 
                 </com.google.android.material.card.MaterialCardView>
 
@@ -635,6 +660,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
+                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView

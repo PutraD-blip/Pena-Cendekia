@@ -246,18 +246,17 @@ class BookApiController extends Controller
         $popularBooks = $featured->take(4)->map(fn($b) => $this->formatFeaturedBook($b))->values();
         $formattedEbooks = $ebooks->map(fn($eb) => $this->formatEbook($eb))->values();
 
-        // Determine latest book (can be the most recent ebook or featured book)
-        $latestFeatured = $featured->first();
-        $latestEbook = $ebooks->first();
+        // Determine latest books (up to 3 books for Home dashboard)
+        $allUploadedBooks = collect()
+            ->merge($ebooks->map(fn($eb) => $this->formatEbook($eb)))
+            ->merge($featured->map(fn($fb) => $this->formatFeaturedBook($fb)))
+            ->unique('id')
+            ->values();
 
-        $latestBook = null;
-        if ($latestEbook && (!$latestFeatured || $latestEbook->created_at >= $latestFeatured->created_at)) {
-            $latestBook = $this->formatEbook($latestEbook);
-        } elseif ($latestFeatured) {
-            $latestBook = $this->formatFeaturedBook($latestFeatured);
-        }
+        $latestBooks = $allUploadedBooks->take(3)->values();
+        $latestBook = $latestBooks->first();
 
-        $editorPick = $featured->skip(1)->first() ? $this->formatFeaturedBook($featured->skip(1)->first()) : $latestBook;
+        $editorPick = null;
 
         $banners = [
             [
@@ -282,6 +281,7 @@ class BookApiController extends Controller
                 'banners' => $banners,
                 'popular_books' => $popularBooks,
                 'latest_book' => $latestBook,
+                'latest_books' => $latestBooks,
                 'editor_pick' => $editorPick,
                 'ebooks' => $formattedEbooks,
                 'total_books' => FeaturedBook::active()->count() + Ebook::active()->count(),
@@ -422,12 +422,12 @@ class BookApiController extends Controller
     /**
      * Convert relative path to full absolute URL.
      */
-    private function resolveCoverUrl(?string $path): string
+    private function resolveCoverUrl(?string $path): ?string
     {
         $host = request()->getSchemeAndHttpHost();
 
         if (!$path) {
-            return "{$host}/images/books/administrasi-rekam-medis.jpg";
+            return null;
         }
 
         if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {

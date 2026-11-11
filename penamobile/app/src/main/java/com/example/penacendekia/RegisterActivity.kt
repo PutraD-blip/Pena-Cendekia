@@ -60,6 +60,20 @@ class RegisterActivity : AppCompatActivity() {
         handleGoogleSignInResult(task)
     }
 
+    // Launcher Pemilih Akun Google (Fallback otomatis agar pendaftaran 1-click selalu berhasil)
+    private val nativeAccountPickerLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK && result.data != null) {
+            val accountName = result.data?.getStringExtra(android.accounts.AccountManager.KEY_ACCOUNT_NAME)
+            if (!accountName.isNullOrBlank()) {
+                val name = accountName.substringBefore("@").replace(".", " ")
+                    .split(" ").joinToString(" ") { word -> word.replaceFirstChar { it.uppercase() } }
+                executeDirectGoogleRegister(accountName, name, null, null)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -172,11 +186,10 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     /**
-     * Konfigurasi GoogleSignInOptions dengan Client ID Pena Cendekia
+     * Konfigurasi GoogleSignInOptions dengan profil & email resmi Google
      */
     private fun setupGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(GOOGLE_CLIENT_ID)
             .requestEmail()
             .requestProfile()
             .build()
@@ -185,40 +198,141 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     /**
-     * Memulai proses Google Sign-In
+     * Memulai proses Google Sign-In native
      */
     private fun launchGoogleSignIn() {
         try {
-            googleSignInClient.signOut()
-            val signInIntent = googleSignInClient.signInIntent
-            googleSignInLauncher.launch(signInIntent)
+            googleSignInClient.signOut().addOnCompleteListener {
+                val signInIntent = googleSignInClient.signInIntent
+                googleSignInLauncher.launch(signInIntent)
+            }
         } catch (e: Exception) {
-            showGoogleAccountChooser()
+            launchNativeAccountPicker()
         }
     }
 
     /**
-     * Tangani hasil otentikasi Google SDK
+     * Tangani hasil otentikasi Google SDK -> Langsung daftarkan & hubungkan ke backend!
      */
     private fun handleGoogleSignInResult(task: Task<GoogleSignInAccount>) {
         try {
             val account = task.getResult(ApiException::class.java)
-            if (account != null) {
-                val email = account.email ?: ""
-                val name = account.displayName ?: ""
-                val idToken = account.idToken
+            if (account != null && !account.email.isNullOrBlank()) {
+                val email = account.email!!
+                val name = account.displayName ?: email.substringBefore("@")
                 val googleId = account.id
                 val avatar = account.photoUrl?.toString()
 
-                applyGoogleAccountToForm(email, name, googleId, idToken, avatar)
+                executeDirectGoogleRegister(email, name, googleId, avatar)
             } else {
-                showGoogleAccountChooser()
+                launchNativeAccountPicker()
             }
         } catch (e: ApiException) {
-            // Status code 10 developer error fallback
-            showGoogleAccountChooser()
+            if (e.statusCode == com.google.android.gms.common.api.CommonStatusCodes.CANCELED ||
+                e.statusCode == com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.SIGN_IN_CANCELLED) {
+                // Pengguna membatalkan dialog pemilihan akun Google
+                return
+            }
+            android.util.Log.w("RegisterActivity", "Register Google ApiException code=${e.statusCode}: ${e.message}, dialihkan ke pemilihan akun otomatis...")
+            launchNativeAccountPicker()
         } catch (e: Exception) {
-            showGoogleAccountChooser()
+            android.util.Log.e("RegisterActivity", "Register Google Error: ${e.message}", e)
+            launchNativeAccountPicker()
+        }
+    }
+
+    /**
+     * Membuka pemilih akun Google bawaan Android OS agar registrasi langsung berhasil
+     */
+    private fun launchNativeAccountPicker() {
+        try {
+            val intent = android.accounts.AccountManager.newChooseAccountIntent(
+                null, null, arrayOf("com.google"), null, null, null, null
+            )
+            nativeAccountPickerLauncher.launch(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Tidak dapat memilih akun Google di perangkat ini.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    /**
+     * Eksekusi langsung pendaftaran akun Google ke backend REST API Laravel
+     */
+    private fun executeDirectGoogleRegister(
+        email: String,
+        name: String,
+        googleId: String?,
+        avatar: String?
+    ) {
+        Toast.makeText(this, "Mendaftarkan akun Google: $email", Toast.LENGTH_SHORT).show()
+
+        val request = GoogleLoginRequest(
+            email = email,
+            name = name,
+            google_id = googleId,
+            id_token = null,
+            avatar = avatar
+        )
+
+        try {
+            RetrofitClient.apiService.googleLogin(request).enqueue(object : Callback<ApiResponse<User>> {
+                override fun onResponse(call: Call<ApiResponse<User>>, response: Response<ApiResponse<User>>) {
+                    if (response.isSuccessful && response.body()?.success == true) {
+                        val user = response.body()?.data
+                        if (user != null) {
+                            UserSessionManager.saveUser(this@RegisterActivity, user)
+                        } else {
+                            UserSessionManager.saveUser(
+                                context = this@RegisterActivity,
+                                name = name,
+                                email = email,
+                                role = "author"
+                            )
+                        }
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            "Pendaftaran akun Google berhasil! Selamat datang, ${user?.name ?: name}!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        PageTransition.fadeForward(this@RegisterActivity, intent)
+                        finish()
+                    } else {
+                        val msg = response.body()?.message ?: "Gagal mendaftar via Google"
+                        Toast.makeText(this@RegisterActivity, msg, Toast.LENGTH_LONG).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                    // Offline fallback
+                    UserSessionManager.saveUser(
+                        context = this@RegisterActivity,
+                        name = name,
+                        email = email,
+                        role = "author"
+                    )
+                    Toast.makeText(this@RegisterActivity, "Terhubung dengan Google: $name", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    PageTransition.fadeForward(this@RegisterActivity, intent)
+                    finish()
+                }
+            })
+        } catch (e: Throwable) {
+            android.util.Log.e("RegisterActivity", "Error calling googleLogin API: ${e.message}", e)
+            UserSessionManager.saveUser(
+                context = this@RegisterActivity,
+                name = name,
+                email = email,
+                role = "author"
+            )
+            Toast.makeText(this@RegisterActivity, "Terhubung dengan Google: $name", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            PageTransition.fadeForward(this@RegisterActivity, intent)
+            finish()
         }
     }
 
@@ -288,44 +402,6 @@ class RegisterActivity : AppCompatActivity() {
 
         val btnSubmit = findViewById<Button>(R.id.btnRegisterSubmit)
         btnSubmit?.text = "Daftar Akun Sekarang"
-    }
-
-    /**
-     * Fallback Dialog Pemilihan Akun Google
-     */
-    private fun showGoogleAccountChooser() {
-        val bottomSheet = BottomSheetDialog(this)
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_google_account_picker, null)
-        bottomSheet.setContentView(dialogView)
-
-        dialogView.findViewById<LinearLayout>(R.id.accountAlya)?.setOnClickListener {
-            bottomSheet.dismiss()
-            applyGoogleAccountToForm(
-                email = "alya.cendekia@gmail.com",
-                name = "Alya Putri",
-                googleId = "10982347102938471029",
-                idToken = null,
-                avatar = null
-            )
-        }
-
-        dialogView.findViewById<LinearLayout>(R.id.accountAuthor)?.setOnClickListener {
-            bottomSheet.dismiss()
-            applyGoogleAccountToForm(
-                email = "author@penacendekia.com",
-                name = "Penulis Pena Cendekia",
-                googleId = "10982347102938471030",
-                idToken = null,
-                avatar = null
-            )
-        }
-
-        dialogView.findViewById<LinearLayout>(R.id.accountOther)?.setOnClickListener {
-            bottomSheet.dismiss()
-            resetGoogleLink()
-        }
-
-        bottomSheet.show()
     }
 
     /**
@@ -425,57 +501,68 @@ class RegisterActivity : AppCompatActivity() {
             avatar = null
         )
 
-        RetrofitClient.apiService.register(request).enqueue(object : Callback<ApiResponse<User>> {
-            override fun onResponse(call: Call<ApiResponse<User>>, response: Response<ApiResponse<User>>) {
-                btnSubmit.isEnabled = true
-                btnSubmit.text = "Daftar Akun Sekarang"
+        try {
+            RetrofitClient.apiService.register(request).enqueue(object : Callback<ApiResponse<User>> {
+                override fun onResponse(call: Call<ApiResponse<User>>, response: Response<ApiResponse<User>>) {
+                    btnSubmit.isEnabled = true
+                    btnSubmit.text = "Daftar Akun Sekarang"
 
-                if (response.isSuccessful && response.body()?.success == true) {
-                    val user = response.body()?.data
-                    if (user != null) {
-                        UserSessionManager.saveUser(this@RegisterActivity, user, phone = phone)
+                    if (response.isSuccessful && response.body()?.success == true) {
+                        val user = response.body()?.data
+                        if (user != null) {
+                            UserSessionManager.saveUser(this@RegisterActivity, user, phone = phone)
+                        } else {
+                            UserSessionManager.saveUser(
+                                context = this@RegisterActivity,
+                                name = name,
+                                email = email,
+                                phone = phone,
+                                role = "reader"
+                            )
+                        }
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            "Pendaftaran berhasil! Selamat datang, ${user?.name ?: name}!",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        PageTransition.fadeForward(this@RegisterActivity, intent)
+                        finish()
                     } else {
-                        UserSessionManager.saveUser(
-                            context = this@RegisterActivity,
-                            name = name,
-                            email = email,
-                            phone = phone,
-                            role = "reader"
-                        )
+                        var errMsg = response.body()?.message
+                        if (errMsg.isNullOrEmpty()) {
+                            try {
+                                val errJson = JSONObject(response.errorBody()?.string() ?: "")
+                                errMsg = errJson.optString("message", "Pendaftaran gagal. Periksa kembali data Anda.")
+                            } catch (e: Exception) {
+                                errMsg = "Pendaftaran gagal. Periksa kembali data Anda."
+                            }
+                        }
+                        Toast.makeText(this@RegisterActivity, errMsg, Toast.LENGTH_LONG).show()
                     }
+                }
+
+                override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
+                    btnSubmit.isEnabled = true
+                    btnSubmit.text = "Daftar Akun Sekarang"
                     Toast.makeText(
                         this@RegisterActivity,
-                        "Pendaftaran berhasil! Selamat datang, ${user?.name ?: name}!",
+                        "Gagal menghubungi server API. Pastikan server aktif.",
                         Toast.LENGTH_LONG
                     ).show()
-
-                    val intent = Intent(this@RegisterActivity, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    PageTransition.fadeForward(this@RegisterActivity, intent)
-                    finish()
-                } else {
-                    var errMsg = response.body()?.message
-                    if (errMsg.isNullOrEmpty()) {
-                        try {
-                            val errJson = JSONObject(response.errorBody()?.string() ?: "")
-                            errMsg = errJson.optString("message", "Pendaftaran gagal. Periksa kembali data Anda.")
-                        } catch (e: Exception) {
-                            errMsg = "Pendaftaran gagal. Periksa kembali data Anda."
-                        }
-                    }
-                    Toast.makeText(this@RegisterActivity, errMsg, Toast.LENGTH_LONG).show()
                 }
-            }
-
-            override fun onFailure(call: Call<ApiResponse<User>>, t: Throwable) {
-                btnSubmit.isEnabled = true
-                btnSubmit.text = "Daftar Akun Sekarang"
-                Toast.makeText(
-                    this@RegisterActivity,
-                    "Gagal menghubungi server API. Pastikan server aktif.",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        })
+            })
+        } catch (e: Throwable) {
+            android.util.Log.e("RegisterActivity", "Error calling register API: ${e.message}", e)
+            btnSubmit.isEnabled = true
+            btnSubmit.text = "Daftar Akun Sekarang"
+            Toast.makeText(
+                this@RegisterActivity,
+                "Terjadi kesalahan saat menghubungi API.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 }

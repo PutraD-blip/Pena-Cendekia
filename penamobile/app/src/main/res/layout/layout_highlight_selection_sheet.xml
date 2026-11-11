@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_dialog"
+    android:orientation="vertical"
+    android:paddingHorizontal="24dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="24dp">
+
+    <!-- Top Drag Handle -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_drag_handle" />
+
+    <!-- Header Row -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            android:id="@+id/tvHighlightSheetTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:fontFamily="@font/lora"
+            android:text="Sorot Kalimat Terpilih"
+            android:textColor="@color/primary_green"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvHighlightSheetPageBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_tag_rounded"
+            android:backgroundTint="@color/bg_light_green"
+            android:fontFamily="@font/inter"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="3dp"
+            android:text="Halaman 11"
+            android:textColor="@color/primary_green"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <!-- Selected Text Preview Card (Word-style Quote) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardSelectedTextPreview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        app:cardBackgroundColor="@color/bg_cream"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/outline_green"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="❝ "
+                android:textColor="@color/primary_green"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSelectedTextPreview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/inter"
+                android:text="Teks kalimat terpilih..."
+                android:textColor="@color/text_dark"
+                android:textSize="12.5sp"
+                android:lineSpacingExtra="2dp"
+                android:maxLines="3"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        android:fontFamily="@font/inter"
+        android:text="Pilih warna sorotan latar untuk kalimat yang dipilih:"
+        android:textColor="@color/text_muted"
+        android:textSize="13sp" />
+
+    <!-- 4 Color Selection Circles -->
+    <LinearLayout
+        android:id="@+id/layoutColorChipsRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Yellow -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/chipColorYellow"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#FFF176"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="1dp"
+            app:strokeColor="@color/primary_green"
+            app:strokeWidth="2.5dp">
+
+            <TextView
+                android:id="@+id/tvLabelYellow"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/inter"
+                android:gravity="center"
+                android:text="✓ Kuning"
+                android:textColor="#333333"
+                android:textSize="11.5sp"
+                android:textStyle="bold" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Green -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/chipColorGreen"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_marginHorizontal="3dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#A5D6A7"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="1dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:id="@+id/tvLabelGreen"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/inter"
+                android:gravity="center"
+                android:text="Hijau"
+                android:textColor="#1B3B2B"
+                android:textSize="11.5sp" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Blue -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/chipColorBlue"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_marginHorizontal="3dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#90CAF9"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="1dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:id="@+id/tvLabelBlue"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/inter"
+                android:gravity="center"
+                android:text="Biru"
+                android:textColor="#0D47A1"
+                android:textSize="11.5sp" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Pink -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/chipColorPink"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#F48FB1"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="1dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:id="@+id/tvLabelPink"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/inter"
+                android:gravity="center"
+                android:text="Pink"
+                android:textColor="#880E4F"
+                android:textSize="11.5sp" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <!-- Optional Note Input -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:fontFamily="@font/inter"
+        android:text="Buat sebagai catatan (opsional):"
+        android:textColor="@color/primary_green"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/etHighlightNoteText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/bg_input_field"
+        android:fontFamily="@font/inter"
+        android:gravity="top|start"
+        android:hint="Tulis rangkuman atau catatan untuk kalimat ini..."
+        android:minLines="2"
+        android:maxLines="4"
+        android:padding="12dp"
+        android:textColor="@color/text_dark"
+        android:textColorHint="@color/text_muted"
+        android:textSize="13sp" />
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelHighlight"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/inter"
+            android:text="Batal"
+            android:textAllCaps="false"
+            android:textColor="@color/text_muted"
+            android:textSize="13.5sp"
+            app:cornerRadius="10dp"
+            app:strokeColor="@color/divider_color" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveHighlight"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1.4"
+            android:fontFamily="@font/inter"
+            android:text="Simpan Sorotan"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="13.5sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/primary_green"
+            app:cornerRadius="10dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
